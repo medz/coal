@@ -1,6 +1,6 @@
 name: coal
 description: A suite for easily building beautiful command-line apps.
-version: 0.0.0-dev
+version: 0.0.0-dev.0
 # repository: https://github.com/my_org/my_repo
 
 environment:
