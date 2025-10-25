@@ -152,5 +152,134 @@ void main() {
         'a\n\uD83C\uDE00\nbc\n\uD83C\uDE00\nd\n\uD83C\uDE00',
       );
     });
+
+    test('properly wraps whitespace with no trimming', () {
+      expect(wrapAnsi('   ', 2, trim: false), '  \n ');
+      expect(wrapAnsi('   ', 2, trim: false, hard: true), '  \n ');
+    });
+
+    test(
+      'trims leading and trailing whitespace only on actual wrapped lines and only with trimming',
+      () {
+        expect(wrapAnsi('   foo   bar   ', 3), 'foo\nbar');
+        expect(wrapAnsi('   foo   bar   ', 6), 'foo\nbar');
+        expect(wrapAnsi('   foo   bar   ', 42), 'foo   bar');
+        expect(wrapAnsi('   foo   bar   ', 42, trim: false), '   foo   bar   ');
+      },
+    );
+
+    test(
+      'trims leading and trailing whitespace inside a color block only on actual wrapped lines and only with trimming',
+      () {
+        expect(
+          wrapAnsi(styleText('   foo   bar   ', [TextStyle.blue]), 6),
+          '${styleText('foo', [TextStyle.blue])}\n${styleText('bar', [TextStyle.blue])}',
+        );
+        expect(
+          wrapAnsi(styleText('   foo   bar   ', [TextStyle.blue]), 42),
+          styleText('foo   bar', [TextStyle.blue]),
+        );
+        expect(
+          wrapAnsi(
+            styleText('   foo   bar   ', [TextStyle.blue]),
+            42,
+            trim: false,
+          ),
+          styleText('   foo   bar   ', [TextStyle.blue]),
+        );
+      },
+    );
+
+    test('properly wraps whitespace between words with no trimming', () {
+      expect(wrapAnsi('foo bar', 3), 'foo\nbar');
+      expect(wrapAnsi('foo bar', 3, hard: true), 'foo\nbar');
+      expect(wrapAnsi('foo bar', 3, trim: false), 'foo\n \nbar');
+      expect(wrapAnsi('foo bar', 3, trim: false, hard: true), 'foo\n \nbar');
+    });
+
+    test('does not multiplicate leading spaces with no trimming', () {
+      expect(wrapAnsi(' a ', 10, trim: false), ' a ');
+      expect(wrapAnsi('   a ', 10, trim: false), '   a ');
+    });
+
+    test(
+      'does not remove spaces in line with ansi escapes when no trimming',
+      () {
+        expect(
+          wrapAnsi(
+            styleText(' ${styleText('OK', [TextStyle.black])} ', [
+              TextStyle.bgGreen,
+            ]),
+            100,
+            trim: false,
+          ),
+          styleText(' ${styleText('OK', [TextStyle.black])} ', [
+            TextStyle.bgGreen,
+          ]),
+        );
+        expect(
+          wrapAnsi(
+            styleText('  ${styleText('OK', [TextStyle.black])} ', [
+              TextStyle.bgGreen,
+            ]),
+            100,
+            trim: false,
+          ),
+          styleText('  ${styleText('OK', [TextStyle.black])} ', [
+            TextStyle.bgGreen,
+          ]),
+        );
+        expect(
+          wrapAnsi(
+            styleText(' hello ', [TextStyle.bgGreen]),
+            10,
+            hard: true,
+            trim: false,
+          ),
+          styleText(' hello ', [TextStyle.bgGreen]),
+        );
+      },
+    );
+
+    test('wraps hyperlinks, preserving clickability in supporting terminals', () {
+      final result1 = wrapAnsi(
+        'Check out \u001B]8;;https://www.example.com\u0007my website\u001B]8;;\u0007, it is \u001B]8;;https://www.example.com\u0007supercalifragilisticexpialidocious\u001B]8;;\u0007.',
+        16,
+        hard: true,
+      );
+      expect(
+        result1,
+        'Check out \u001B]8;;https://www.example.com\u0007my\u001B]8;;\u0007\n\u001B]8;;https://www.example.com\u0007website\u001B]8;;\u0007, it is\n\u001B]8;;https://www.example.com\u0007supercalifragili\u001B]8;;\u0007\n\u001B]8;;https://www.example.com\u0007sticexpialidocio\u001B]8;;\u0007\n\u001B]8;;https://www.example.com\u0007us\u001B]8;;\u0007.',
+      );
+
+      final result2 = wrapAnsi(
+        'Check out \u001B]8;;https://www.example.com\u0007my \uD83C\uDE00 ${styleText('website', [TextStyle.bgGreen])}\u001B]8;;\u0007, it ${styleText('is \u001B]8;;https://www.example.com\u0007super\uD83C\uDE00califragilisticexpialidocious\u001B]8;;\u0007', [TextStyle.bgRed])}.',
+        16,
+        hard: true,
+      );
+      expect(
+        result2,
+        'Check out \u001B]8;;https://www.example.com\u0007my 🈀\u001B]8;;\u0007\n\u001B]8;;https://www.example.com\u0007\u001B[42mwebsite\u001B[49m\u001B]8;;\u0007, it \u001B[41mis\u001B[49m\n\u001B[41m\u001B]8;;https://www.example.com\u0007super🈀califragi\u001B]8;;\u0007\u001B[49m\n\u001B[41m\u001B]8;;https://www.example.com\u0007listicexpialidoc\u001B]8;;\u0007\u001B[49m\n\u001B[41m\u001B]8;;https://www.example.com\u0007ious\u001B]8;;\u0007\u001B[49m.',
+      );
+    });
+  });
+
+  test('covers non-SGR/non-hyperlink ansi escapes', () {
+    expect(wrapAnsi('Hello, \u001B[1D World!', 8), 'Hello,\u001B[1D\nWorld!');
+    expect(
+      wrapAnsi('Hello, \u001B[1D World!', 8, trim: false),
+      'Hello, \u001B[1D \nWorld!',
+    );
+  });
+
+  test('normalizes newlines', () {
+    expect(
+      wrapAnsi('foobar\r\nfoobar\r\nfoobar\nfoobar', 3, hard: true),
+      'foo\nbar\nfoo\nbar\nfoo\nbar\nfoo\nbar',
+    );
+    expect(
+      wrapAnsi('foo bar\r\nfoo bar\r\nfoo bar\nfoo bar', 3),
+      'foo\nbar\nfoo\nbar\nfoo\nbar\nfoo\nbar',
+    );
   });
 }
