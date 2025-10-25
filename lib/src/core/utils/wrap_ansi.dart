@@ -1,5 +1,6 @@
 // This ref https://github.com/43081j/fast-wrap-ansi/blob/main/src/main.ts
 import "package:unorm_dart/unorm_dart.dart" show nfc;
+import 'package:characters/characters.dart';
 
 import '_constants.dart';
 import 'text_width.dart';
@@ -38,13 +39,13 @@ String _wrapAnsiHyperlink(String url) =>
     '$esc$_ansiEscapeLink$url$_ansiEscapeBell';
 
 void _wrapWord(List<String> rows, String word, int columns) {
-  final Iterable<String>(iterator: characters) = word.split('');
+  final chars = word.characters.iterator;
   var isInsideEscape = false,
       isInsideLinkEscape = false,
       lastRow = rows.lastOrNull,
       visible = lastRow == null ? 0 : getTextWidth(lastRow),
-      character = characters.moveNext() ? characters.current : null,
-      nextCharacter = characters.moveNext() ? characters.current : null,
+      character = chars.moveNext() ? chars.current : null,
+      nextCharacter = chars.moveNext() ? chars.current : null,
       rawCharacterIndex = 0;
   while (character != null) {
     final characterLength = getTextWidth(character);
@@ -82,7 +83,7 @@ void _wrapWord(List<String> rows, String word, int columns) {
 
     rawCharacterIndex += character.length;
     character = nextCharacter;
-    nextCharacter = characters.moveNext() ? characters.current : null;
+    nextCharacter = chars.moveNext() ? chars.current : null;
   }
 
   lastRow = rows.lastOrNull;
@@ -120,7 +121,7 @@ String _exec(
   }
 
   final result = StringBuffer();
-  double? escapeCode;
+  int? escapeCode;
   String? escapeUrl;
 
   final words = text.split(' ');
@@ -190,28 +191,23 @@ String _exec(
   }
 
   final preString = rows.join('\n');
-  bool inSurrogate = false;
+  final chars = preString.characters;
+  final charList = chars.toList();
+  var codeUnitIndex = 0;
 
-  for (int index = 0; index < preString.length; index++) {
-    final character = preString[index];
+  for (int i = 0; i < charList.length; i++) {
+    final character = charList[i];
     result.write(character);
 
-    if (!inSurrogate) {
-      inSurrogate =
-          character.codeUnitAt(0) >= 0xD800 &&
-          character.codeUnitAt(0) <= 0xDBFF;
-      if (inSurrogate) {
-        continue;
-      }
-    } else {
-      inSurrogate = false;
-    }
-
-    if (character == esc || character == csiSb) {
-      final match = _groupRegex.firstMatch(preString.substring(index + 1));
+    // Check for escape sequences using the first code unit
+    final firstCodeUnit = character.isEmpty ? null : character[0];
+    if (firstCodeUnit == esc || firstCodeUnit == csiSb) {
+      final match = _groupRegex.firstMatch(
+        preString.substring(codeUnitIndex + 1),
+      );
       if (match != null) {
         if (match.namedGroup('code') case final String code) {
-          final parsedCode = double.tryParse(code);
+          final parsedCode = int.tryParse(code);
           escapeCode = parsedCode == _endCode ? null : parsedCode;
         } else if (match.namedGroup('uri') case final String uri) {
           escapeUrl = uri.isEmpty ? null : uri;
@@ -219,7 +215,9 @@ String _exec(
       }
     }
 
-    if (preString.elementAtOrNull(index + 1) == '\n') {
+    final nextCharacter = i + 1 < charList.length ? charList[i + 1] : null;
+
+    if (nextCharacter == '\n') {
       if (escapeUrl?.isNotEmpty == true) {
         result.write(_wrapAnsiHyperlink(''));
       }
@@ -237,26 +235,18 @@ String _exec(
       if (escapeCode != null &&
           escapeCode != 0 &&
           _getClosingCode(escapeCode) != 0) {
-        result.write(_wrapAnsiCode(escapeCode.toInt()));
+        result.write(_wrapAnsiCode(escapeCode));
       }
 
       if (escapeUrl != null && escapeUrl.isNotEmpty == true) {
         result.write(_wrapAnsiHyperlink(escapeUrl));
       }
     }
+
+    codeUnitIndex += character.length;
   }
 
   return result.toString();
-}
-
-extension on String {
-  String? elementAtOrNull(int index) {
-    try {
-      return this[index];
-    } catch (_) {
-      return null;
-    }
-  }
 }
 
 String wrapAnsi(
