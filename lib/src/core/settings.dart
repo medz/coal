@@ -41,3 +41,10 @@ final class _Setings implements CoalSettings {
 }
 
 final CoalSettings settings = _Setings();
+
+bool isActionKey(Action action, Iterable<String> keys) {
+  for (final key in keys) {
+    if (settings.aliases[key] == action) return true;
+  }
+  return false;
+}

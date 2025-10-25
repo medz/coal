@@ -1,2 +1,2 @@
-const esc = '\x1b';
+const esc = '\x1B';
 const csi = "$esc[";
