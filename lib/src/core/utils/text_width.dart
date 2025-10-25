@@ -32,11 +32,17 @@ final _latinPattern = RegExp(r'(?:[\x20-\x7E\xA0-\xFF](?!\uFE0F)){1,1000}');
 final _modifierPattern = RegExp(r'\p{M}+', unicode: true);
 final _surrogatePairPattern = RegExp(r'[\uD800-\uDBFF][\uDC00-\uDFFF]');
 
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 int _getCodePointLength(String input) {
   final Iterable(:length) = _surrogatePairPattern.allMatches(input);
   return input.length - length;
 }
 
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 bool _isWideNotCjktNoEmmoji(int x) {
   return x == 0x231B ||
       x == 0x2329 ||
@@ -60,6 +66,9 @@ bool _isWideNotCjktNoEmmoji(int x) {
       x >= 0x30000 && x <= 0x3FFFD;
 }
 
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 bool _isFullWidth(int x) {
   return x == 0x3000 ||
       x >= 0xFF01 && x <= 0xFF60 ||
@@ -79,6 +88,9 @@ extension on String {
     return substring(actualStart, clampedEnd);
   }
 
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
   int safeCodeUnitAt(int index) {
     try {
       return codeUnitAt(index);
@@ -89,6 +101,9 @@ extension on String {
 }
 
 extension on num {
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
   int safeFloor() {
     try {
       return floor();
