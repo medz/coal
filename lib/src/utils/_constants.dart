@@ -1,3 +1,2 @@
-const esc = '\x1B';
+const esc = '\x1b';
 const csi = "$esc[";
-const beep = '\x07';
