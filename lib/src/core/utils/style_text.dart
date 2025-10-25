@@ -81,6 +81,9 @@ enum TextStyle {
   final int close;
 }
 
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 String _escape(int code) => '$csi${code}m';
 
 String styleText(String text, Iterable<TextStyle> styles) {
