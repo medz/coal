@@ -1,3 +1,4 @@
+// This ref https://github.com/fabiospampinato/fast-string-truncated-width
 import 'dart:math' as math show max, min;
 
 final _ansiPattern = RegExp(
@@ -28,7 +29,7 @@ final _emojiPattern = RegExp(
   unicode: true,
 );
 final _latinPattern = RegExp(r'(?:[\x20-\x7E\xA0-\xFF](?!\uFE0F)){1,1000}');
-final _modifierPattern = RegExp(r'\p{M}+');
+final _modifierPattern = RegExp(r'\p{M}+', unicode: true);
 final _surrogatePairPattern = RegExp(r'[\uD800-\uDBFF][\uDC00-\uDFFF]');
 
 int _getCodePointLength(String input) {
@@ -65,19 +66,51 @@ bool _isFullWidth(int x) {
       x >= 0xFFE0 && x <= 0xFFE6;
 }
 
-({int width, int index, bool truncated, bool ellipsed}) getTextTruncatedWidth(
+extension on String {
+  String safeSubstring(int start, [int? end]) {
+    final clampedStart = start < 0
+        ? (length + start).clamp(0, length)
+        : start.clamp(0, length);
+    final clampedEnd = end == null
+        ? length
+        : (end < 0 ? (length + end).clamp(0, length) : end.clamp(0, length));
+    final actualStart = clampedStart.clamp(0, clampedEnd);
+    if (actualStart >= clampedEnd) return '';
+    return substring(actualStart, clampedEnd);
+  }
+
+  int safeCodeUnitAt(int index) {
+    try {
+      return codeUnitAt(index);
+    } catch (_) {
+      return 0;
+    }
+  }
+}
+
+extension on num {
+  int safeFloor() {
+    try {
+      return floor();
+    } catch (_) {
+      return 0;
+    }
+  }
+}
+
+({num width, int index, bool truncated, bool ellipsed}) getTextTruncatedWidth(
   String input, {
   /*------------- Truncation ----------------*/
-  double limit = double.infinity,
+  num limit = double.infinity,
   String ellipsis = '',
-  int? ellipsisWidth,
+  num? ellipsisWidth,
   /*------------- Special Width ----------------*/
-  int controlWidth = 0,
-  int tabWidth = 8,
+  num controlWidth = 0,
+  num tabWidth = 8,
   /*------------- Other Width ----------------*/
-  int emojiWidth = 2,
-  int regularWidth = 1,
-  int? wideWidth,
+  num emojiWidth = 2,
+  num regularWidth = 1,
+  num? wideWidth,
 }) {
   ellipsisWidth ??= ellipsis.isNotEmpty
       ? getTextTruncatedWidth(
@@ -100,17 +133,17 @@ bool _isFullWidth(int x) {
     (_emojiPattern, emojiWidth),
     (_cjktWidePattern, wideWidth),
   ];
-  var indexPrev = 0,
+  int indexPrev = 0,
       index = 0,
       length = input.length,
       lengthExtra = 0,
-      truncationEnabled = false,
-      truncationIndex = length,
-      truncationLimit = math.max(0, limit - ellipsisWidth),
       unmatchedStart = 0,
       unmatchedEnd = 0,
+      truncationIndex = length;
+  num truncationLimit = math.max(0, limit - ellipsisWidth),
       width = 0,
       widthExtra = 0;
+  bool truncationEnabled = false;
 
   parser:
   while (true) {
@@ -162,7 +195,7 @@ bool _isFullWidth(int x) {
         if ((width + widthExtra) > truncationLimit) {
           truncationIndex = math.min(
             truncationIndex,
-            index + ((truncationLimit - width) / blockWidth).floor(),
+            index + ((truncationLimit - width) / blockWidth).safeFloor(),
           );
         }
 
@@ -184,31 +217,33 @@ bool _isFullWidth(int x) {
   }
 
   return (
-    width: (truncationEnabled ? truncationLimit : width).toInt(),
+    width: (truncationEnabled ? truncationLimit : width),
     index: truncationEnabled ? truncationIndex : length,
     truncated: truncationEnabled,
     ellipsed: truncationEnabled && limit >= ellipsisWidth,
   );
 }
 
-extension on String {
-  String safeSubstring(int start, [int? end]) {
-    final clampedStart = start < 0
-        ? (length + start).clamp(0, length)
-        : start.clamp(0, length);
-    final clampedEnd = end == null
-        ? length
-        : (end < 0 ? (length + end).clamp(0, length) : end.clamp(0, length));
-    final actualStart = clampedStart.clamp(0, clampedEnd);
-    if (actualStart >= clampedEnd) return '';
-    return substring(actualStart, clampedEnd);
-  }
-
-  int safeCodeUnitAt(int index) {
-    try {
-      return codeUnitAt(index);
-    } catch (_) {
-      return 0;
-    }
-  }
+num getTextWidth(
+  String input, {
+  /*------------- Special Width ----------------*/
+  num controlWidth = 0,
+  num tabWidth = 8,
+  /*------------- Other Width ----------------*/
+  num emojiWidth = 2,
+  num regularWidth = 1,
+  num? wideWidth,
+}) {
+  final result = getTextTruncatedWidth(
+    input,
+    limit: double.infinity,
+    ellipsis: r'',
+    ellipsisWidth: 0,
+    controlWidth: controlWidth,
+    tabWidth: tabWidth,
+    emojiWidth: emojiWidth,
+    regularWidth: regularWidth,
+    wideWidth: wideWidth,
+  );
+  return result.width;
 }
