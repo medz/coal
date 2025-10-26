@@ -68,7 +68,7 @@ print(args.toJson());
 
 Coal has prepared a series of convenient tools for generating ANSI:
 
-- **[Clear]**: Generate clear ANSI text utility.
+- **[Clear](#clear)**: Generate clear ANSI text utility.
 - **[Cursor](#cursor)**: Generate cursor operation ANSI text utility.
 - **[Erase](#erase)**: Erase ANSI text utility.
 - **[Scroll](#scroll)**: Scroll ANSI text utility.
