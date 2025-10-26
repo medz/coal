@@ -84,14 +84,14 @@ Coal has prepared a series of convenient tools for generating ANSI:
 
 | Name | Description |
 |:----:|:----|
-| `cursorUp([int count = 1])` | Move the cursor up by `count` lines. |
-| `cursorDown([int count = 1])` | Move the cursor down by `count` lines. |
-| `cursorForward([int count = 1])` | Move the cursor forward by `count` columns. |
-| `cursorBackward([int count = 1])` | Move the cursor backward by `count` columns. |
-| `cursorNextLine([int count = 1])` | Move the cursor to the next line by `count` lines. |
-| `cursorPrevLine([int count = 1])` | Move the cursor to the previous line by `count` lines. |
-| `cursorTo(int x, [int? y])` | Move the cursor to the specified position. |
-| `cursorMove(int x, int y)` | Move the cursor by `x` columns and `y` lines. |
+| `cursorUp()` | Move the cursor up by `count` lines. |
+| `cursorDown()` | Move the cursor down by `count` lines. |
+| `cursorForward()` | Move the cursor forward by `count` columns. |
+| `cursorBackward()` | Move the cursor backward by `count` columns. |
+| `cursorNextLine()` | Move the cursor to the next line by `count` lines. |
+| `cursorPrevLine()` | Move the cursor to the previous line by `count` lines. |
+| `cursorTo()` | Move the cursor to the specified position. |
+| `cursorMove()` | Move the cursor by `x` columns and `y` lines. |
 | `cursorShow` | Show the cursor. |
 | `cursorHide` | Hide the cursor. |
 | `cursorSave` | Save the cursor position. |
@@ -106,18 +106,18 @@ Coal has prepared a series of convenient tools for generating ANSI:
 | `eraseLine` | Erase the current line. |
 | `eraseLineStart` | Erase from the current cursor position to the beginning of the line. |
 | `eraseLineEnd` | Erase from the current cursor position to the end of the line. |
-| `eraseUp([int count = 1])` | Erase `count` lines above the current cursor position. |
-| `eraseDown([int count = 1])` | Erase `count` lines below the current cursor position. |
-| `eraseLines(int count)` | Erase `count` lines above and below the current cursor position. |
+| `eraseUp()` | Erase `count` lines above the current cursor position. |
+| `eraseDown()` | Erase `count` lines below the current cursor position. |
+| `eraseLines()` | Erase `count` lines above and below the current cursor position. |
 
 ### Scroll
 
 | Name | Description |
 |:----:|:----|
-| `scrollUp([int count = 1])` | Scroll the screen up by `count` lines. |
-| `scrollDown([int count = 1])` | Scroll the screen down by `count` lines. |
-| `scrollLeft([int count = 1])` | Scroll the screen left by `count` columns. |
-| `scrollRight([int count = 1])` | Scroll the screen right by `count` columns. |
+| `scrollUp()` | Scroll the screen up by `count` lines. |
+| `scrollDown()` | Scroll the screen down by `count` lines. |
+| `scrollLeft()` | Scroll the screen left by `count` columns. |
+| `scrollRight()` | Scroll the screen right by `count` columns. |
 
 ### Text
 
