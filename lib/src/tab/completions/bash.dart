@@ -11,14 +11,14 @@ String bash(String name, String exec) {
 #----------------------------------------
 
 # debug completion
-__coal_${escapedName}_debug() {
+${escapedName}_debug() {
   if [[ -n \${BASH_COMP_DEBUG_FILE:-} ]]; then
     echo "\$*" >> "\${BASH_COMP_DEBUG_FILE}"
   fi
 }
 
 # handle completions
-__coal_${escapedName}_complete() {
+${escapedName}_complete() {
   local cur prev words cword
   _get_comp_words_by_ref -n "=:" cur prev words cword
 
@@ -99,6 +99,6 @@ __coal_${escapedName}_complete() {
 }
 
 # Register completion
-complete -F __coal_${escapedName}_complete $name
+complete -F ${escapedName}_complete $name
 ''';
 }
