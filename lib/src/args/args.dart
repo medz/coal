@@ -22,6 +22,12 @@ abstract interface class Args implements Argv<Map<String, Argv>> {
 
   Iterable<String> get rest;
   Iterable<Object?> get coerceRest;
+
+  @override
+  Map<String, Object> toJson();
+
+  Argv? at(String name);
+  Argv? operator [](String name);
 }
 
 class _ArgsImpl extends Argv<Map<String, Argv>> implements Args {
@@ -36,6 +42,21 @@ class _ArgsImpl extends Argv<Map<String, Argv>> implements Args {
 
   @override
   final Iterable<Object?> coerceRest;
+
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
+  @override
+  Argv? at(String name) => value[name];
+
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
+  @override
+  Argv? operator [](String name) => at(name);
+
+  @override
+  Map<String, Object> toJson() => (super.toJson() as Map).cast();
 
   @override
   String toString() =>

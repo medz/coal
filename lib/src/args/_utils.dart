@@ -10,7 +10,14 @@ final quotedRegex = RegExp(
 
 enum ValueType { bool, string, list }
 
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 bool isBoolean(String value) => value == 'true' || value == 'false';
+
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 bool isQuoted(String value) => value.startsWith(r'"') || value.startsWith(r"'");
 
 void dotNestedSet<T>(
@@ -20,13 +27,14 @@ void dotNestedSet<T>(
   ValueType? type,
 ]) {
   if (key.contains('.')) {
-    final parts = key.split('.');
+    final parts = key.split('.'), last = parts.last;
     for (final part in parts) {
+      if (part == last) break;
       final nested = Argv(<String, Argv>{});
       dotNestedSet(argv, part, nested);
       argv = nested;
     }
-    key = parts.last;
+    key = last;
   }
 
   if (type == ValueType.list && argv.value.containsKey(key)) {
@@ -63,12 +71,14 @@ Object? coerce(String? value, [ValueType? type]) {
   if (value == null || value.isEmpty) return value;
   if (value.length > 3 && isBoolean(value)) return value == 'true';
   if (value.length > 2 && isQuoted(value)) return value.unquoted;
-  if (num.tryParse(value.substring(1)) case final num value) {
-    return switch (value) {
+  if ((value[0] == '.' && num.tryParse(value[1]) != null) ||
+      num.tryParse(value[0]) != null) {
+    return switch (num.parse(value)) {
       int value => value,
       double value => value,
     };
   }
+
   return value;
 }
 
@@ -80,6 +90,9 @@ Argv wrapValue<T>(T value) {
   };
 }
 
+@pragma('vm:prefer-inline')
+@pragma('wasm:prefer-inline')
+@pragma('dart2js:prefer-inline')
 Map<String, Argv> wrapDefaults(Map<String, Object?> value) {
   return value.map((key, value) => MapEntry(key, wrapValue(value)));
 }

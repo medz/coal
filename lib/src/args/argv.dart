@@ -5,10 +5,23 @@ class Argv<T> {
 
   final T value;
 
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
   R as<R>() => value as R;
 
-  // ignore: unnecessary_this
-  R? safeAs<R>() => value is R ? this.as<R>() : null;
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
+  R? safeAs<R>() {
+    // ignore: unnecessary_this
+    return value is R ? this.as<R>() : null;
+  }
+
+  @pragma('vm:prefer-inline')
+  @pragma('wasm:prefer-inline')
+  @pragma('dart2js:prefer-inline')
+  Object? toJson() => nestedToJson(value);
 
   @override
   String toString() {
@@ -20,9 +33,7 @@ class Argv<T> {
 }
 
 extension<T> on Argv<T> {
-  Object? toJson() => nestedToJson(value);
-
-  static Object? nestedToJson(Object? value) => switch (value) {
+  Object? nestedToJson(Object? value) => switch (value) {
     Iterable(:final map) => [...map((e) => nestedToJson(e))],
     Map(:final map) => map((k, v) => MapEntry(k, nestedToJson(v))),
     Argv(:final value) => nestedToJson(value),
