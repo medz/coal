@@ -9,9 +9,9 @@ A suite for easily building beautiful command-line apps.
 
 | Entry | Description |
 |:----:|:----|
-| [`package:coal/coal.dart`](#args-parser) | [**WIP**] Provides functionality for building command-line apps. |
-| `package:coal/args.dart` | Provides command-line argument parsing functionality. |
-| `package:coal/utils.dart` | Provides utility functions for ANSI escape codes. |
+| `package:coal/coal.dart` | [**WIP**] Provides functionality for building command-line apps. |
+| [`package:coal/args.dart`)(#args-parser) | Provides command-line argument parsing functionality. |
+| [`package:coal/utils.dart`](#) | Provides utility functions for ANSI escape codes. |
 
 ## Installation
 
@@ -49,7 +49,7 @@ print(args.toJson());
 > [!WARNING]
 > Coal is currently under development and documentation is not yet ready.
 
-## Utility
+## ANSI Utility
 
 Coal has prepared a series of convenient tools for generating ANSI:
 
