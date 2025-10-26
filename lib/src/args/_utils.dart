@@ -1,12 +1,5 @@
 import 'dart:convert';
-
 import 'argv.dart';
-
-final quotedRegex = RegExp(
-  r'^('
-  r"'"
-  r'|").*\1$',
-);
 
 enum ValueType { bool, string, list }
 
