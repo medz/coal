@@ -1,7 +1,7 @@
 name: coal
 description: A suite for easily building beautiful command-line apps.
 version: 0.0.0-dev.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/medz/coal
 
 environment:
   sdk: ^3.9.2
@@ -12,6 +12,8 @@ dependencies:
   meta: ^1.17.0
 
 dev_dependencies:
+  args: ^2.7.0
+  benchmark_harness: ^2.3.1
   lints: ^6.0.0
   oxy: ^0.0.4
   test: ^1.25.6
