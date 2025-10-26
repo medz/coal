@@ -11,7 +11,7 @@ A suite for easily building beautiful command-line apps.
 |:----:|:----|
 | `package:coal/coal.dart` | [**WIP**] Provides functionality for building command-line apps. |
 | [`package:coal/args.dart`)(#args-parser) | Provides command-line argument parsing functionality. |
-| [`package:coal/utils.dart`](#) | Provides utility functions for ANSI escape codes. |
+| [`package:coal/utils.dart`](#ansi-utility) | Provides utility functions for ANSI escape codes. |
 
 ## Installation
 
@@ -53,7 +53,17 @@ print(args.toJson());
 
 Coal has prepared a series of convenient tools for generating ANSI:
 
-- **[Cursor](#cursor)**: Generate cursor operation
+- **[Clear]**: Generate clear ANSI text utility.
+- **[Cursor](#cursor)**: Generate cursor operation ANSI text utility.
+- **[Erase](#erase)**: Erase ANSI text utility.
+- **[Scroll](#scroll)**: Scroll ANSI text utility.
+- **[Text](#text)**: Generate text ANSI text utility.
+
+### Clear
+
+| Name | Description |
+|:----:|:----|
+| `clearScreen()` | Clear the terminal screen. |
 
 ### Cursor
 
@@ -72,3 +82,45 @@ Coal has prepared a series of convenient tools for generating ANSI:
 | `cursorSave` | Save the cursor position. |
 | `cursorRestore` | Restore the cursor position. |
 | `cursorLeft` | Move the cursor left by one column. |
+
+### Erase
+
+| Name | Description |
+|:----:|:----|
+| `eraseScreen` | Erase the entire screen. |
+| `eraseLine` | Erase the current line. |
+| `eraseLineStart` | Erase from the current cursor position to the beginning of the line. |
+| `eraseLineEnd` | Erase from the current cursor position to the end of the line. |
+| `eraseUp([int count = 1])` | Erase `count` lines above the current cursor position. |
+| `eraseDown([int count = 1])` | Erase `count` lines below the current cursor position. |
+| `eraseLines(int count)` | Erase `count` lines above and below the current cursor position. |
+
+### Scroll
+
+| Name | Description |
+|:----:|:----|
+| `scrollUp([int count = 1])` | Scroll the screen up by `count` lines. |
+| `scrollDown([int count = 1])` | Scroll the screen down by `count` lines. |
+| `scrollLeft([int count = 1])` | Scroll the screen left by `count` columns. |
+| `scrollRight([int count = 1])` | Scroll the screen right by `count` columns. |
+
+### Text
+
+- `stripVTControlCharacters()`: Remove all VT control characters. Use to estimate displayed string width.
+- `getTextTruncatedWidth()`: Get the width of a string when truncated to fit within a given width.
+- `getTextWidth()`: Get the width of a string.
+- `wrapAnsi()`: Wrap a string to fit within a given width.
+- `styleText`: Generate a string with ANSI escape codes for styling.
+
+#### Style Text
+
+```dart
+// Dart SDK >= 3.10.0
+final text = styleText('Hello, World!', [.red]);
+// <= 3.10.0
+final text = styleText('Hello, World!', [TextStyle.red]);
+```
+
+## License
+
+[MIT License](LICENSE)
