@@ -3,7 +3,11 @@
 A suite for easily building beautiful command-line apps.
 
 > [!WARNING]
-> The Coal is still in development and may not be fully functional.
+> **The Coal is still in development and may not be fully functional.**
+>
+> Coal is not a CLI framework! It's intended to provide a convenient and easy-to-use command-line tool for existing CLI frameworks and developers.
+>
+> **Coal also doesn't plan to add command functionality. Its purpose is to enhance existing CLI packages.**
 
 ## Modules
 
@@ -12,6 +16,18 @@ A suite for easily building beautiful command-line apps.
 | `package:coal/coal.dart` | [**WIP**] Provides functionality for building command-line apps. |
 | [`package:coal/args.dart`)(#args-parser) | Provides command-line argument parsing functionality. |
 | [`package:coal/utils.dart`](#ansi-utility) | Provides utility functions for ANSI escape codes. |
+
+## Roadmap
+
+- [x] Args: Command-line argument parsing
+- [x] Utils: ANSI utility functions
+- [ ] Keypass: Binding key input
+- [ ] Readline: Waiting for input
+- [ ] Prompt: Basic prompt process support and CLI frame handling.
+- [ ] Prompt Utils: Advanced commonly used prompt utils
+- [ ] Tab: Shell command autocompletion
+- [ ] Tab Adapters: Adds tab completion adapters for popular Dart CLI packages.
+
 
 ## Installation
 
