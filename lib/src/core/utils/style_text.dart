@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import '_constants.dart';
+import '../_constants.dart';
 
 enum TextStyle {
   /*------------------------- Modifier -------------------------*/

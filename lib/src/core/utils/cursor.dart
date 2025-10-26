@@ -1,4 +1,4 @@
-import '_constants.dart';
+import '../_constants.dart';
 
 @pragma('vm:prefer-inline')
 @pragma('wasm:prefer-inline')

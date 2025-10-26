@@ -1,5 +1,3 @@
-export 'src/core/settings.dart';
-
 /*------------ Utils ------------*/
 export 'src/core/utils/clear.dart';
 export 'src/core/utils/cursor.dart';

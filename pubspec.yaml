@@ -12,6 +12,7 @@ dependencies:
   alien_signals: ^1.0.3
   unorm_dart: ^0.3.2
   characters: ^1.4.1
+  meta: ^1.17.0
 
 dev_dependencies:
   lints: ^6.0.0

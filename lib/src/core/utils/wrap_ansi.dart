@@ -2,7 +2,7 @@
 import "package:unorm_dart/unorm_dart.dart" show nfc;
 import 'package:characters/characters.dart';
 
-import '_constants.dart';
+import '../_constants.dart';
 import 'text_width.dart';
 
 const _endCode = 39;
