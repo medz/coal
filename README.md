@@ -9,7 +9,7 @@ A suite for easily building beautiful command-line apps.
 
 | Entry | Description |
 |:----:|:----|
-| `package:coal/coal.dart` | [**WIP**] Provides functionality for building command-line apps. |
+| [`package:coal/coal.dart`](#args-parser) | [**WIP**] Provides functionality for building command-line apps. |
 | `package:coal/args.dart` | Provides command-line argument parsing functionality. |
 | `package:coal/utils.dart` | Provides utility functions for ANSI escape codes. |
 
