@@ -55,9 +55,6 @@ String cursorNextLine([int count = 1]) => '${csi}E' * count;
 @pragma('dart2js:prefer-inline')
 String cursorPrevLine([int count = 1]) => '${csi}F' * count;
 
-@pragma('vm:prefer-inline')
-@pragma('wasm:prefer-inline')
-@pragma('dart2js:prefer-inline')
 String cursorTo(int x, [int? y]) {
   return y == null || y == 0 ? '$csi${x + 1}G' : '$csi${y + 1};${x + 1}H';
 }

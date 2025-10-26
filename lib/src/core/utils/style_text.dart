@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import '../_constants.dart';
 
 enum TextStyle {
@@ -87,7 +85,7 @@ enum TextStyle {
 String _escape(int code) => '$csi${code}m';
 
 String styleText(String text, Iterable<TextStyle> styles) {
-  if (text.isEmpty || styles.isEmpty || !stdout.supportsAnsiEscapes) {
+  if (text.isEmpty || styles.isEmpty) {
     return text;
   }
 
