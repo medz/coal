@@ -1,4 +1,4 @@
-import 'package:coal/coal.dart';
+import 'package:coal/utils.dart';
 import 'package:oxy/oxy.dart';
 import 'package:test/test.dart';
 
