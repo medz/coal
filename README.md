@@ -12,7 +12,7 @@ A suite for easily building beautiful command-line apps.
 ## Modules
 
 | Entry | Status | Description |
-|:----:|----:|:----|
+|:----:|:----:|:----|
 | [`package:coal/args.dart`](#args-parser) | ✅ | Provides command-line argument parsing functionality. |
 | [`package:coal/utils.dart`](#ansi-utility) | ✅ | Provides utility functions for ANSI escape codes and text manipulation. |
 | [`package:coal/tab.dart`](#tab) | 🚧 | Provides shell command completion and command-line app adapters. |
@@ -25,8 +25,9 @@ A suite for easily building beautiful command-line apps.
 - [ ] Readline: Input handling
 - [ ] Prompt: Basic prompt process support and CLI frame handling
 - [ ] Prompt Utils: Advanced commonly used prompt utilities
-- [ ] Tab: Shell command autocompletion
+- [x] Tab: Shell command autocompletion
 - [ ] Tab Adapters: Tab completion adapters for popular Dart CLI packages
+- [ ] Dart CLI setup: Add completion to `dart` command
 
 
 ## Installation
