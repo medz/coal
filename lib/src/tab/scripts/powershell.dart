@@ -172,10 +172,10 @@ String powershellScript(String name, String exec) {
         \$Values = \$Values | Sort-Object -Property Name
     }
 
-    if (($Directive -band \$ShellCompDirectiveNoFileComp) -ne 0 ) {
+    if ((\$Directive -band \$ShellCompDirectiveNoFileComp) -ne 0 ) {
         __${name}_debug "ShellCompDirectiveNoFileComp is called"
 
-        if ($Values.Length -eq 0) {
+        if (\$Values.Length -eq 0) {
             # Just print an empty string here so the
             # shell does not start to complete paths.
             # We cannot use CompletionResult here because
@@ -186,13 +186,13 @@ String powershellScript(String name, String exec) {
     }
 
     # Get the current mode
-    $Mode = (Get-PSReadLineKeyHandler | Where-Object { $_.Key -eq "Tab" }).Function
-    __${name}_debug "Mode: $Mode"
+    \$Mode = (Get-PSReadLineKeyHandler | Where-Object { \$_.Key -eq "Tab" }).Function
+    __${name}_debug "Mode: \$Mode"
 
-    $Values | ForEach-Object {
+    \$Values | ForEach-Object {
 
-        # store temporary because switch will overwrite $_
-        $comp = $_
+        # store temporary because switch will overwrite \$_
+        \$comp = \$_
 
         # PowerShell supports three different completion modes
         # - TabCompleteNext (default windows style - on each key press the next option is displayed)
@@ -206,31 +206,31 @@ String powershellScript(String name, String exec) {
         # 3) ResultType     type of completion result
         # 4) ToolTip        text for the tooltip with details about the object
 
-        switch ($Mode) {
+        switch (\$Mode) {
 
             # bash like
             "Complete" {
 
-                if ($Values.Length -eq 1) {
+                if (\$Values.Length -eq 1) {
                     __${name}_debug "Only one completion left"
 
                     # insert space after value
-                    [System.Management.Automation.CompletionResult]::new($($comp.Name | __${name}_escapeStringWithSpecialChars) + $Space, "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
+                    [System.Management.Automation.CompletionResult]::new(\$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
 
                 } else {
                     # Add the proper number of spaces to align the descriptions
-                    while($comp.Name.Length -lt $Longest) {
-                        $comp.Name = $comp.Name + " "
+                    while(\$comp.Name.Length -lt \$Longest) {
+                        \$comp.Name = \$comp.Name + " "
                     }
 
                     # Check for empty description and only add parentheses if needed
-                    if ($($comp.Description) -eq " " ) {
-                        $Description = ""
+                    if (\$(\$comp.Description) -eq " " ) {
+                        \$Description = ""
                     } else {
-                        $Description = "  ($($comp.Description))"
+                        \$Description = "  (\$(\$comp.Description))"
                     }
 
-                    [System.Management.Automation.CompletionResult]::new("$($comp.Name)$Description", "$($comp.Name)$Description", 'ParameterValue', "$($comp.Description)")
+                    [System.Management.Automation.CompletionResult]::new("\$(\$comp.Name)\$Description", "\$(\$comp.Name)\$Description", 'ParameterValue', "\$(\$comp.Description)")
                 }
              }
 
@@ -239,7 +239,7 @@ String powershellScript(String name, String exec) {
                 # insert space after value
                 # MenuComplete will automatically show the ToolTip of
                 # the highlighted value at the bottom of the suggestions.
-                [System.Management.Automation.CompletionResult]::new($($comp.Name | __${name}_escapeStringWithSpecialChars) + $Space, "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
+                [System.Management.Automation.CompletionResult]::new(\$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
             }
 
             # TabCompleteNext and in case we get something unknown
@@ -247,7 +247,7 @@ String powershellScript(String name, String exec) {
                 # Like MenuComplete but we don't want to add a space here because
                 # the user need to press space anyway to get the completion.
                 # Description will not be shown because that's not possible with TabCompleteNext
-                [System.Management.Automation.CompletionResult]::new($($comp.Name | __${name}_escapeStringWithSpecialChars), "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
+                [System.Management.Automation.CompletionResult]::new(\$(\$comp.Name | __${name}_escapeStringWithSpecialChars), "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
             }
         }
 
