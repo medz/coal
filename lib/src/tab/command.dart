@@ -1,6 +1,6 @@
-typedef CompleteCallback = void Function(String value, String description);
+typedef Complete = void Function(String value, String description);
 typedef CompleteHandler =
-    void Function(CompleteCallback complete, Map<String, Option> options);
+    void Function(Complete complete, Map<String, Option> options);
 
 class Completion {
   const Completion({required this.value, this.description});
