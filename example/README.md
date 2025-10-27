@@ -1,6 +1,6 @@
 # Coal Examples
 
-## <TAB>
+## \<TAB\>
 
 Setup:
 ```bash
@@ -23,7 +23,7 @@ tab complete powershell > ~/.tab-completion.ps1
 echo '. ~/.tab-completion.ps1' > $PROFILE
 ```
 
-### Try <TAB>
+### Try \<TAB\>
 
 ```bash
 tab <TAB>
