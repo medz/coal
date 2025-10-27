@@ -37,13 +37,13 @@ To install the Coal suite, run the following command:
 dart pub add coal
 ```
 
-## <TAB>
+## \<TAB\>
 
 <video src="https://github.com/user-attachments/assets/3a298e80-a3d9-4d26-82f5-349eee4650f5" width="640"></video>
 
 ### Core
 
-Coal's core <TAB> completion implementation allows you to add completion functionality to any Dart command-line app:
+Coal's core \<TAB\> completion implementation allows you to add completion functionality to any Dart command-line app:
 
 ```dart
 final tab = Tab();
@@ -57,7 +57,7 @@ complete.argument('shell', (complete, _) {
 });
 ```
 
-There is a simple TAB demo → [<TAB> example](example/README.md#tab)
+There is a simple TAB demo → [\<TAB\> example](example/README.md#tab)
 
 > Thanks to [Cobra](https://github.com/spf13/cobra)! for the script and some of the <TAB> implementation references!
 
