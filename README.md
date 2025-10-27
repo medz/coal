@@ -39,7 +39,7 @@ dart pub add coal
 
 ## <TAB>
 
-<video src="https://github.com/user-attachments/assets/3a298e80-a3d9-4d26-82f5-349eee4650f5" width="640" />
+<video src="https://github.com/user-attachments/assets/3a298e80-a3d9-4d26-82f5-349eee4650f5" width="640"></video>
 
 ### Core
 
