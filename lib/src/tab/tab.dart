@@ -3,8 +3,8 @@ import 'command.dart';
 import 'flags.dart';
 import 'shell.dart';
 
-class CoalTab extends Command {
-  CoalTab([String? name, String? description])
+class Tab extends Command {
+  Tab([String? name, String? description])
     : super(name ?? '', description ?? '');
 
   final commands = <String, Command>{};
@@ -16,13 +16,15 @@ class CoalTab extends Command {
     return commands[value] = Command(value, description);
   }
 
-  void parse(List<String> args) {
+  void parse(final Iterable<String> input) {
     completions.clear();
-    final endsWithSpace = args.lastOrNull == '';
+    final args = [...input], endsWithSpace = args.lastOrNull == '';
     if (endsWithSpace) args.pop();
 
     String toComplete = args.lastOrNull ?? '';
-    final previousArgs = args.sublist(0, args.length - 1);
+    final previousArgs = args.isNotEmpty
+        ? args.sublist(0, args.length - 1)
+        : args;
 
     if (endsWithSpace) {
       if (toComplete.isNotEmpty) previousArgs.add(toComplete);
@@ -66,8 +68,8 @@ class CoalTab extends Command {
     complete(toComplete);
   }
 
-  void setup(String name, String exec, String shellName) {
-    shellName = shellName.trim().toLowerCase();
+  void setup(String name, String exec, String? shellName) {
+    shellName = shellName?.trim().toLowerCase();
     final shell = Shell.values.firstWhere(
       (shell) => shell.name == shellName,
       orElse: () => throw UnsupportedError('Unsupported shell'),
@@ -76,7 +78,7 @@ class CoalTab extends Command {
   }
 }
 
-extension on CoalTab {
+extension on Tab {
   Option? findOption(Command command, String name) {
     if (command.options[name] case Option option) return option;
     if (command.options[name.withoutDashesLeft] case Option option) {
