@@ -1,10 +1,6 @@
 typedef CompleteCallback = void Function(String value, String description);
-typedef CompleteHandler<T> =
-    void Function(
-      T param,
-      CompleteCallback complete,
-      Map<String, Option> options,
-    );
+typedef CompleteHandler =
+    void Function(CompleteCallback complete, Map<String, Option> options);
 
 class Completion {
   const Completion({required this.value, this.description});
@@ -24,7 +20,7 @@ class Argument {
   final String name;
   final bool variadic;
   final Command command;
-  final CompleteHandler<Argument>? handler;
+  final CompleteHandler? handler;
 }
 
 class Option {
@@ -42,7 +38,7 @@ class Option {
   final String description;
   final String? alias;
   final bool? isBool;
-  final CompleteHandler<Option>? handler;
+  final CompleteHandler? handler;
 }
 
 class Command {
@@ -57,7 +53,7 @@ class Command {
 
   Argument argument(
     String name,
-    CompleteHandler<Argument>? handler, {
+    CompleteHandler? handler, {
     bool variadic = false,
   }) {
     return arguments[name] = Argument(this, name, handler, variadic: variadic);
@@ -66,7 +62,7 @@ class Command {
   Option option(
     String value,
     String description,
-    CompleteHandler<Option>? handler, {
+    CompleteHandler? handler, {
     String? alias,
   }) {
     return options[value] = Option(

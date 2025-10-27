@@ -167,7 +167,7 @@ extension on Tab {
     return false;
   }
 
-  bool shouldCompleteCommands(String toComplete) => toComplete.startsWith('-');
+  bool shouldCompleteCommands(String toComplete) => !toComplete.startsWith('-');
 
   void handleFlagCompletion(
     Command command,
@@ -186,7 +186,6 @@ extension on Tab {
       if (option?.handler != null) {
         final suggestions = <Completion>[];
         option?.handler?.call(
-          option,
           (value, description) => suggestions.add(
             Completion(value: value, description: description),
           ),
@@ -279,7 +278,6 @@ extension on Tab {
     if (targetArgument != null && targetArgument.handler != null) {
       final suggestions = <Completion>[];
       targetArgument.handler?.call(
-        targetArgument,
         (value, description) =>
             suggestions.add(Completion(value: value, description: description)),
         command.options,
