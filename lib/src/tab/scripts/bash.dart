@@ -1,7 +1,9 @@
+// reference: https://github.com/spf13/cobra/blob/main/bash_completionsV2.go
+
 import '../flags.dart';
 import '_utils.dart';
 
-String bash(String name, String exec) {
+String bashScript(String name, String exec) {
   final escapedName = nameForVar(name);
   return '''# Coal bash completion for $name
 #----------------------------------------

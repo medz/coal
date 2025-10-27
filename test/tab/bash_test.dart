@@ -6,7 +6,7 @@ import '_def.dart';
 void main() {
   group('bash shell completion', () {
     test('should generate a valid bash completion script', () {
-      final script = bash(name, exec);
+      final script = Shell.bash.generate(name, exec);
 
       expect(script, contains('requestComp="$exec complete --'));
       expect(
@@ -48,7 +48,7 @@ void main() {
     });
 
     test('should handle special characters in the name', () {
-      final script = bash(specialName, exec);
+      final script = Shell.bash.generate(specialName, exec);
       expect(script, contains('${escapedName}_debug()'));
       expect(script, contains('${escapedName}_complete()'));
       expect(

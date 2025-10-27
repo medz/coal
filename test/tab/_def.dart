@@ -1,4 +1,4 @@
-import 'package:coal/src/tab/completions/_utils.dart';
+import 'package:coal/src/tab/scripts/_utils.dart';
 
 const name = 'coaltest';
 const specialName = 'coal-test:app';

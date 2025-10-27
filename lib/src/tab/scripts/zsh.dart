@@ -1,7 +1,9 @@
+// Reference: https://github.com/spf13/cobra/blob/main/zsh_completions.go
+
 import '../flags.dart';
 import '_utils.dart';
 
-String zsh(String name, String exec) {
+String zshScript(String name, String exec) {
   final escapedName = nameForVar(name);
   return '''#compdef $name
 compdef ${escapedName}_complete $name
