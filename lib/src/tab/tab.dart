@@ -200,11 +200,7 @@ extension on Tab {
 
     if (toComplete.startsWith('-')) {
       final isShortFlag = !toComplete.startsWith('--');
-      int start = 0;
-      while (start < toComplete.length && toComplete[start] == '-') {
-        start++;
-      }
-      final cleanToComplete = toComplete.substring(start);
+      final cleanToComplete = toComplete.withoutDashesLeft;
 
       for (final MapEntry(key: name, value: option)
           in command.options.entries) {
