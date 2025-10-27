@@ -11,49 +11,47 @@ void main() {
       expect(script, contains('requestComp="$exec complete --'));
       expect(
         script,
+        contains('if [[ \$((directive & \$ShellCompDirectiveError)) -ne 0 ]]'),
+      );
+      expect(
+        script,
         contains(
-          'if [[ \$((directive & ${ShellCompleteDirective.error})) -ne 0 ]]',
+          'if [[ \$((directive & \$ShellCompDirectiveNoSpace)) -ne 0 ]]',
         ),
       );
       expect(
         script,
         contains(
-          'if [[ \$((directive & ${ShellCompleteDirective.noSpace})) -ne 0 ]]',
+          'if [[ \$((directive & \$ShellCompDirectiveKeepOrder)) -ne 0 ]]',
         ),
       );
       expect(
         script,
         contains(
-          'if [[ \$((directive & ${ShellCompleteDirective.keepOrder})) -ne 0 ]]',
+          'if [[ \$((directive & \$ShellCompDirectiveNoFileComp)) -ne 0 ]]',
         ),
       );
       expect(
         script,
         contains(
-          'if [[ \$((directive & ${ShellCompleteDirective.noFileCompletion})) -ne 0 ]]',
+          'if [[ \$((directive & \$ShellCompDirectiveFilterFileExt)) -ne 0 ]]',
         ),
       );
       expect(
         script,
         contains(
-          'if [[ \$((directive & ${ShellCompleteDirective.filterFileExtension})) -ne 0 ]]',
-        ),
-      );
-      expect(
-        script,
-        contains(
-          'if [[ \$((directive & ${ShellCompleteDirective.filterDirectory})) -ne 0 ]]',
+          'if [[ \$((directive & \$ShellCompDirectiveFilterDirs)) -ne 0 ]]',
         ),
       );
     });
 
     test('should handle special characters in the name', () {
       final script = Shell.bash.generate(specialName, exec);
-      expect(script, contains('${escapedName}_debug()'));
-      expect(script, contains('${escapedName}_complete()'));
+      expect(script, contains('__${escapedName}_debug()'));
+      expect(script, contains('__${escapedName}_complete()'));
       expect(
         script,
-        contains('complete -F ${escapedName}_complete $specialName'),
+        contains('complete -F __${escapedName}_complete $specialName'),
       );
     });
   });

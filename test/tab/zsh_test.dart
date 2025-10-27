@@ -8,9 +8,9 @@ void main() {
     test('should handle special characters in the name', () {
       final script = Shell.zsh.generate(specialName, exec);
       expect(script, contains('#compdef $specialName'));
-      expect(script, contains('compdef ${escapedName}_complete $specialName'));
-      expect(script, contains('${escapedName}_debug()'));
-      expect(script, contains('${escapedName}_complete()'));
+      expect(script, contains('compdef _$escapedName $specialName'));
+      expect(script, contains('__${escapedName}_debug()'));
+      expect(script, contains('_$escapedName()'));
     });
   });
 }
