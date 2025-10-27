@@ -3,9 +3,9 @@
 A suite for easily building beautiful command-line apps.
 
 > [!WARNING]
-> **The Coal is still in development and may not be fully functional.**
+> **Coal is still in development and may not be fully functional.**
 >
-> Coal is not a CLI framework! It's intended to provide a convenient and easy-to-use command-line tool for existing CLI frameworks and developers.
+> Coal is not a CLI framework! It's intended to provide convenient and easy-to-use utilities for existing CLI frameworks and developers.
 >
 > **Coal also doesn't plan to add command functionality. Its purpose is to enhance existing CLI packages.**
 
@@ -14,19 +14,19 @@ A suite for easily building beautiful command-line apps.
 | Entry | Status | Description |
 |:----:|----:|:----|
 | [`package:coal/args.dart`](#args-parser) | ✅ | Provides command-line argument parsing functionality. |
-| [`package:coal/utils.dart`](#ansi-utility) | ✅ | Provides utility functions for ANSI escape codes. |
-| `package:coal/tab.dart` | 🚧 | Shell command completion & command-line apps adapter. |
+| [`package:coal/utils.dart`](#ansi-utility) | ✅ | Provides utility functions for ANSI escape codes and text manipulation. |
+| `package:coal/tab.dart` | 🚧 | Provides shell command completion and command-line app adapters. |
 
 ## Roadmap
 
 - [x] [Args: Command-line argument parsing](#args-parser)
 - [x] [Utils: ANSI utility functions](#ansi-utility)
-- [ ] Keypass: Binding key input
-- [ ] Readline: Waiting for input
+- [ ] Keypass: Key input binding
+- [ ] Readline: Input handling
 - [ ] Prompt: Basic prompt process support and CLI frame handling
-- [ ] Prompt Utils: Advanced commonly used prompt utils
+- [ ] Prompt Utils: Advanced commonly used prompt utilities
 - [ ] Tab: Shell command autocompletion
-- [ ] Tab Adapters: Adds tab completion adapters for popular Dart CLI packages
+- [ ] Tab Adapters: Tab completion adapters for popular Dart CLI packages
 
 
 ## Installation
@@ -44,7 +44,7 @@ Coal provides a powerful argument parser that allows you to define and parse com
 ```dart
 import 'package:coal/args.dart';
 
-final input = const input = ['--a=1','-b','--bool','--no-boop','--multi=foo','--multi=baz','-xyz'];
+const input = ['--a=1','-b','--bool','--no-boop','--multi=foo','--multi=baz','-xyz'];
 final args = Args.parse(input);
 
 print(args.toJson());
@@ -67,13 +67,13 @@ print(args.toJson());
 
 ## ANSI Utility
 
-Coal has prepared a series of convenient tools for generating ANSI:
+Coal provides a series of convenient utilities for generating ANSI escape codes:
 
-- **[Clear](#clear)**: Generate clear ANSI text utility.
-- **[Cursor](#cursor)**: Generate cursor operation ANSI text utility.
-- **[Erase](#erase)**: Erase ANSI text utility.
-- **[Scroll](#scroll)**: Scroll ANSI text utility.
-- **[Text](#text)**: Generate text ANSI text utility.
+- **[Clear](#clear)**: Clear screen utilities.
+- **[Cursor](#cursor)**: Cursor manipulation utilities.
+- **[Erase](#erase)**: Text erasing utilities.
+- **[Scroll](#scroll)**: Screen scrolling utilities.
+- **[Text](#text)**: Text styling and manipulation utilities.
 
 ### Clear
 
@@ -126,7 +126,7 @@ Coal has prepared a series of convenient tools for generating ANSI:
 - `getTextTruncatedWidth()`: Get the width of a string when truncated to fit within a given width.
 - `getTextWidth()`: Get the width of a string.
 - `wrapAnsi()`: Wrap a string to fit within a given width.
-- `styleText`: Generate a string with ANSI escape codes for styling.
+- `styleText()`: Generate a string with ANSI escape codes for styling.
 
 #### Style Text
 
