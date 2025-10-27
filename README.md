@@ -25,7 +25,7 @@ A suite for easily building beautiful command-line apps.
 - [ ] Readline: Input handling
 - [ ] Prompt: Basic prompt process support and CLI frame handling
 - [ ] Prompt Utils: Advanced commonly used prompt utilities
-- [x] Tab: Shell command autocompletion
+- [x] [Tab: Shell command autocompletion](#core)
 - [ ] Tab Adapters: Tab completion adapters for popular Dart CLI packages
 - [ ] Dart CLI setup: Add completion to `dart` command
 
