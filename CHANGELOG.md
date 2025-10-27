@@ -1,6 +1,6 @@
 ## 0.0.3
 
-- <TAB>: Tab completion
+- Coal's core \<TAB\> completion implementation!
 
 ## 0.0.2
 
