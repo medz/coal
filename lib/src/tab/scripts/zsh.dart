@@ -74,7 +74,7 @@ ${escapedName}_complete() {
   ${escapedName}_debug "completions: \${out}"
   ${escapedName}_debug "flagPrefix: \${flagPrefix}"
 
-  if [ \$((directive & ${ShellCompleteDirective.error})) -ne 0 ]; then
+  if [ \$((directive & ${ShellCompDirective.error})) -ne 0 ]; then
     ${escapedName}_debug "Completion received error. Ignoring completions."
     return
   fi
@@ -108,24 +108,24 @@ ${escapedName}_complete() {
   done < <(printf "%s\n" "\${out[@]}")
 
   if [ \$hasActiveHelp -eq 1 ]; then
-    if [ \${#completions} -ne 0 ] || [ \$((directive & ${ShellCompleteDirective.noFileCompletion})) -eq 0 ]; then
+    if [ \${#completions} -ne 0 ] || [ \$((directive & ${ShellCompDirective.noFileComp})) -eq 0 ]; then
       ${escapedName}_debug "Adding activeHelp delimiter"
       compadd -x "--"
       hasActiveHelp=0
     fi
   fi
 
-  if [ \$((directive & ${ShellCompleteDirective.noSpace})) -ne 0 ]; then
+  if [ \$((directive & ${ShellCompDirective.noSpace})) -ne 0 ]; then
     ${escapedName}_debug "Activating nospace."
     noSpace="-S ''"
   fi
 
-  if [ \$((directive & ${ShellCompleteDirective.keepOrder})) -ne 0 ]; then
+  if [ \$((directive & ${ShellCompDirective.keepOrder})) -ne 0 ]; then
     ${escapedName}_debug "Activating keep order."
     keepOrder="-V"
   fi
 
-  if [ \$((directive & ${ShellCompleteDirective.filterFileExtension})) -ne 0 ]; then
+  if [ \$((directive & ${ShellCompDirective.filterFileExt})) -ne 0 ]; then
     local filteringCmd
     filteringCmd='_files'
     for filter in \${completions[@]}; do
@@ -138,7 +138,7 @@ ${escapedName}_complete() {
 
     ${escapedName}_debug "File filtering command: \$filteringCmd"
     _arguments '*:filename:'"\$filteringCmd"
-  elif [ \$((directive & ${ShellCompleteDirective.filterDirectory})) -ne 0 ]; then
+  elif [ \$((directive & ${ShellCompDirective.filterDirs})) -ne 0 ]; then
     local subdir
     subdir="\${completions[1]}"
     if [ -n "\$subdir" ]; then
@@ -163,7 +163,7 @@ ${escapedName}_complete() {
     else
       ${escapedName}_debug "_describe did not find completions."
       ${escapedName}_debug "Checking if we should do file completion."
-      if [ \$((directive & ${ShellCompleteDirective.noFileCompletion})) -ne 0 ]; then
+      if [ \$((directive & ${ShellCompDirective.noFileComp})) -ne 0 ]; then
         ${name}_debug "deactivating file completion"
         return 0
       else

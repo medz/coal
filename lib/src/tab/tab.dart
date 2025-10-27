@@ -8,7 +8,7 @@ class CoalTab extends Command {
   final commands = <String, Command>{};
   final completions = <Completion>[];
 
-  ShellCompleteDirective directive = ShellCompleteDirective.none;
+  ShellCompDirective directive = ShellCompDirective.none;
 
   Command command(String value, String description) {
     return commands[value] = Command(value, description);

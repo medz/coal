@@ -45,23 +45,23 @@ ${escapedName}_complete() {
   fi
 
   # Process completions based on directive
-  if [[ \$((directive & ${ShellCompleteDirective.error})) -ne 0 ]]; then
+  if [[ \$((directive & ${ShellCompDirective.error})) -ne 0 ]]; then
     return
   fi
 
   Apply directives
-  if [[ \$((directive & ${ShellCompleteDirective.noSpace})) -ne 0 ]]; then
+  if [[ \$((directive & ${ShellCompDirective.noSpace})) -ne 0 ]]; then
     compopt -o nospace
   fi
-  if [[ \$((directive & ${ShellCompleteDirective.keepOrder})) -ne 0 ]]; then
+  if [[ \$((directive & ${ShellCompDirective.keepOrder})) -ne 0 ]]; then
     compopt -o nosort
   fi
-  if [[ \$((directive & ${ShellCompleteDirective.noFileCompletion})) -ne 0 ]]; then
+  if [[ \$((directive & ${ShellCompDirective.noFileComp})) -ne 0 ]]; then
     compopt +o default
   fi
 
   # Handle file extension filtering
-  if [[ \$((directive & ${ShellCompleteDirective.filterFileExtension})) -ne 0 ]]; then
+  if [[ \$((directive & ${ShellCompDirective.filterFileExt})) -ne 0 ]]; then
     local filter=""
     for ext in \$out; do
       filter="\$filter|\$ext"
@@ -73,7 +73,7 @@ ${escapedName}_complete() {
   fi
 
   # Handle directory filtering
-  if [[ \$((directive & ${ShellCompleteDirective.filterDirectory})) -ne 0 ]]; then
+  if [[ \$((directive & ${ShellCompDirective.filterDirs})) -ne 0 ]]; then
     compopt -o dirnames
     COMPREPLY=( \$(compgen -d -- "\$cur") )
     return
