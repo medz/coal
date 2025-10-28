@@ -71,7 +71,7 @@ class Command {
       description,
       handler,
       alias: alias,
-      isBool: handler != null,
+      isBool: handler == null,
     );
   }
 }

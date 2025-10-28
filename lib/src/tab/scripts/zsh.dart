@@ -46,7 +46,7 @@ _$escapedName() {
     lastChar=\${lastParam[-1]}
     __${escapedName}_debug "lastParam: \${lastParam}, lastChar: \${lastChar}"
 
-    # For zsh, when completing a flag with an = (e.g., $escapedName -n=<TAB>)
+    # For zsh, when completing a flag with an = (e.g., $name -n=<TAB>)
     # completions must be prefixed with the flag
     setopt local_options BASH_REMATCH
     if [[ "\${lastParam}" =~ '-.*=' ]]; then

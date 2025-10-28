@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:coal/tab.dart';
 
 void main(List<String> input) {
@@ -11,12 +10,6 @@ void main(List<String> input) {
     complete('80', 'HTTP port');
     complete('443', 'HTTPS port');
     complete('3000', 'Development port');
-  });
-  dev.argument('--port', (complete, _) {
-    complete('--port=0', 'Any port');
-    complete('--port=80', 'HTTP port');
-    complete('--port=443', 'HTTPS port');
-    complete('--port=3000', 'Development port');
   });
 
   final complete = tab.command('complete', '<TAB> autocompletion');
@@ -33,7 +26,11 @@ void main(List<String> input) {
       final args = input.skip(2);
       return tab.parse(args);
     } else {
-      return tab.setup('tab', Platform.script.toFilePath(), shell);
+      return tab.setup(
+        'dart tab.dart',
+        'dart ${Platform.script.toFilePath()}',
+        shell,
+      );
     }
   }
 
