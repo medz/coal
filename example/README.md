@@ -33,7 +33,7 @@ echo '. ~/.tab-completion.ps1' > $PROFILE
 tab <TAB>
 ```
 
-## [`package:args`](https://pub.dev/packages/args) Adapter
+## `args` Adapter
 
 ```bash
 dart compile exe args_example.dart --output=args_example
