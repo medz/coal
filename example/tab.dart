@@ -2,21 +2,19 @@ import 'dart:io';
 
 import 'package:coal/tab.dart';
 
+import 'a.dart';
+
 void main(List<String> input) {
+  // p();
+
   final tab = Tab();
 
   final dev = tab.command('dev', 'Start development server');
-  dev.option('port', 'Port number', (complete, _) {
+  final a = dev.option('port', 'Port number', (complete, _) {
     complete('0', 'Any port');
     complete('80', 'HTTP port');
     complete('443', 'HTTPS port');
     complete('3000', 'Development port');
-  });
-  dev.argument('--port', (complete, _) {
-    complete('--port=0', 'Any port');
-    complete('--port=80', 'HTTP port');
-    complete('--port=443', 'HTTPS port');
-    complete('--port=3000', 'Development port');
   });
 
   final complete = tab.command('complete', '<TAB> autocompletion');

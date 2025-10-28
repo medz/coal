@@ -4,8 +4,7 @@ import 'flags.dart';
 import 'shell.dart';
 
 class Tab extends Command {
-  Tab([String? name, String? description])
-    : super(name ?? '', description ?? '');
+  Tab() : super('', '');
 
   final commands = <String, Command>{};
   final completions = <Completion>[];

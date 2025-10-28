@@ -1,69 +1,55 @@
 // ignore: depend_on_referenced_packages
-import 'package:args/args.dart';
-// ignore: depend_on_referenced_packages
 import 'package:args/command_runner.dart';
 import 'package:coal/tab.dart' hide Command;
 
-class GenerateShellScriptCommand extends Command {
-  GenerateShellScriptCommand(this.shell);
+class CompleteCommand extends Command {
+  CompleteCommand(this.runner);
 
-  final Shell shell;
-
-  @override
-  String get name => shell.name;
-
-  @override
-  String get description => switch (shell) {
-    Shell.bash => 'Generate a bash shell script',
-    Shell.zsh => 'Generate a zsh shell script',
-    Shell.fish => 'Generate a fish shell script',
-    Shell.powershell => 'Generate a powershell shell script',
-  };
-
-  @override
-  void run() {}
-}
-
-class SetupCommand extends Command {
-  SetupCommand(CommandRunner runner) {
-    for (final shell in Shell.values) {
-      addSubcommand(GenerateShellScriptCommand(shell));
-    }
-  }
-
-  @override
-  String get name => 'setup';
-
-  @override
-  String get description => 'Setip';
-
-  @override
-  void run() {
-    print('Setup command completion');
-  }
-}
-
-class CompateCommand extends Command {
-  CompateCommand() {
-    addSubcommand(SetupCommand(runner));
-  }
+  late final tab = Tab();
 
   @override
   final CommandRunner runner;
 
   @override
-  String get name => 'compate';
+  String get name => 'complete';
 
   @override
-  String get description => '${runner.executableName} command completion';
+  String get description =>
+      '${runner.executableName} Generate completion script';
+
+  @override
+  String get invocation {
+    final parents = [name];
+    for (Command? command = parent; command != null; command = command.parent) {
+      parents.add(command.name);
+    }
+    final invocation = parents.reversed.join(' ');
+    return '$invocation <${Shell.values.map((e) => e.name).join('|')}>';
+  }
 
   @override
   void run() {
-    print('Setup command completion');
+    final shell = argResults?.arguments.firstOrNull;
+    if (shell == '--') {
+      final args = argResults?.arguments.skip(1) ?? const <String>[];
+      return tab.parse(args);
+    }
+
+    // return tab.setup();
   }
 }
 
-void tab(ArgParser argParser, Iterable<String> input) {
-  final command = CompateCommand();
-  argParser.addCommand(command.name, command.argParser);
+Tab tab(CommandRunner runner) {
+  final commend = CompleteCommand(runner);
+  runner.addCommand(commend);
+
+  // TODO register
+
+  return commend.tab;
+}
+
+void main(List<String> input) {
+  final runner = CommandRunner('tab', '');
+  tab(runner);
+  runner.run(input);
 }
