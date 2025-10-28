@@ -1,16 +1,11 @@
 import 'dart:io';
-
 import 'package:coal/tab.dart';
 
-import 'a.dart';
-
 void main(List<String> input) {
-  // p();
-
   final tab = Tab();
 
   final dev = tab.command('dev', 'Start development server');
-  final a = dev.option('port', 'Port number', (complete, _) {
+  dev.option('port', 'Port number', (complete, _) {
     complete('0', 'Any port');
     complete('80', 'HTTP port');
     complete('443', 'HTTPS port');
@@ -31,7 +26,11 @@ void main(List<String> input) {
       final args = input.skip(2);
       return tab.parse(args);
     } else {
-      return tab.setup('tab', Platform.script.toFilePath(), shell);
+      return tab.setup(
+        'dart tab.dart',
+        'dart ${Platform.script.toFilePath()}',
+        shell,
+      );
     }
   }
 
