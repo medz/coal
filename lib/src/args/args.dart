@@ -5,14 +5,14 @@ import 'argv.dart';
 
 abstract interface class Args implements Argv<Map<String, Argv>> {
   factory Args.parse(
-    Iterable<String> argv, {
+    Iterable<String> input, {
     Map<String, Object?>? defaults,
     Map<String, String>? aliases,
     Iterable<String>? bool,
     Iterable<String>? string,
     Iterable<String>? list,
   }) => _parse(
-    argv,
+    input,
     defaults: defaults,
     aliases: aliases,
     bool: bool,
@@ -63,7 +63,7 @@ class _ArgsImpl extends Argv<Map<String, Argv>> implements Args {
 }
 
 Args _parse(
-  Iterable<String> argv, {
+  Iterable<String> input, {
   Map<String, Object?>? defaults,
   Map<String, String>? aliases,
   Iterable<String>? bool,
@@ -73,11 +73,11 @@ Args _parse(
   final wrappedDefaults = defaults != null && defaults.isNotEmpty
       ? wrapDefaults(defaults)
       : <String, Argv>{};
-  if (argv.isEmpty) return _ArgsImpl(wrapDefaults(wrappedDefaults));
+  if (input.isEmpty) return _ArgsImpl(wrapDefaults(wrappedDefaults));
   final rest = <String>[],
       coerceRest = [],
       args = _ArgsImpl(wrappedDefaults, rest, coerceRest),
-      length = argv.length,
+      length = input.length,
       types = {
         ValueType.bool: [...?bool],
         ValueType.string: [...?string],
@@ -85,7 +85,8 @@ Args _parse(
       };
 
   for (int index = 0; index < length; index++) {
-    final curr = argv.elementAt(index), next = argv.elementAtOrNull(index + 1);
+    final curr = input.elementAt(index),
+        next = input.elementAtOrNull(index + 1);
     ValueType? type;
     String key = '';
     String? value;
