@@ -21,7 +21,7 @@ abstract interface class Args implements Argv<Map<String, Argv>> {
   );
 
   Iterable<String> get rest;
-  Iterable<Object?> get coerceRest;
+  Iterable<Object?> get args;
 
   @override
   Map<String, Object> toJson();
@@ -31,17 +31,13 @@ abstract interface class Args implements Argv<Map<String, Argv>> {
 }
 
 class _ArgsImpl extends Argv<Map<String, Argv>> implements Args {
-  const _ArgsImpl(
-    super.value, [
-    this.rest = const [],
-    this.coerceRest = const [],
-  ]);
+  const _ArgsImpl(super.value, [this.rest = const [], this.args = const []]);
 
   @override
   final Iterable<String> rest;
 
   @override
-  final Iterable<Object?> coerceRest;
+  final Iterable<Object?> args;
 
   @pragma('vm:prefer-inline')
   @pragma('wasm:prefer-inline')
@@ -62,7 +58,7 @@ class _ArgsImpl extends Argv<Map<String, Argv>> implements Args {
   String toString() =>
       '\n\rcoal.Args\n\r'
       '- rest: $rest\n\r'
-      '- coerceRest: $coerceRest\n\r'
+      '- args: $args\n\r'
       '${super.toString()}\n\r';
 }
 

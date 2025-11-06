@@ -117,7 +117,7 @@ void main() {
       const rest = [1, 2, 3];
       final args = Args.parse(input);
       expect(args.toJson(), output);
-      expect(args.coerceRest, rest);
+      expect(args.args, rest);
     });
 
     test("--a.a1 1 --b.b1 2 --c.c1 3 -d -e", () {
@@ -231,7 +231,7 @@ void main() {
 
       expect(args.toJson(), output);
       expect(args.rest, rest);
-      expect(args.coerceRest, rest);
+      expect(args.args, rest);
     });
   });
 

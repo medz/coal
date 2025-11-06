@@ -1,3 +1,7 @@
+## 0.0.5
+
+- refactor: rename `coerceRest` to `args`
+
 ## 0.0.4
 
 - fix: option handler boolean flag logic
