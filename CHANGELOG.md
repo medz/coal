@@ -2,6 +2,7 @@
 
 - chore: relax characters constraint to ^1.4.0
 - chore: move args to dependencies for tab/args.dart
+- fix: restore emoji regex in text width
 
 ## 0.0.5
 
