@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   unorm_dart: ^0.3.2
-  characters: ^1.4.1
+  characters: ^1.4.0
   meta: ^1.17.0
 
 dev_dependencies:

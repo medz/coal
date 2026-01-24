@@ -1,3 +1,7 @@
+## Unreleased
+
+- chore: relax characters constraint to ^1.4.0
+
 ## 0.0.5
 
 - refactor: rename `coerceRest` to `args`
