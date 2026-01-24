@@ -1,11 +1,8 @@
-## Unreleased
+## 0.0.5 - 2026-01-24
 
 - chore: relax characters constraint to ^1.4.0
 - chore: move args to dependencies for tab/args.dart
 - fix: restore emoji regex in text width
-
-## 0.0.5
-
 - refactor: rename `coerceRest` to `args`
 
 ## 0.0.4
