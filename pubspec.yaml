@@ -7,12 +7,13 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  # Required by lib/tab/args.dart for CommandRunner integration.
+  args: ^2.7.0
   unorm_dart: ^0.3.2
   characters: ^1.4.0
   meta: ^1.17.0
 
 dev_dependencies:
-  args: ^2.7.0
   benchmark_harness: ^2.3.1
   lints: ^6.0.0
   oxy: ^0.0.4

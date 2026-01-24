@@ -1,6 +1,7 @@
 ## Unreleased
 
 - chore: relax characters constraint to ^1.4.0
+- chore: move args to dependencies for tab/args.dart
 
 ## 0.0.5
 

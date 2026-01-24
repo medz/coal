@@ -3,7 +3,12 @@ import 'package:coal/src/args/_utils.dart';
 
 import 'argv.dart';
 
+/// Parsed CLI arguments with structured access to options and positionals.
 abstract interface class Args implements Argv<Map<String, Argv>> {
+  /// Parses raw CLI input into a structured argument tree.
+  ///
+  /// Use [defaults] to seed option values, [aliases] to map short flags to full
+  /// names, and [bool]/[string]/[list] to hint the expected types.
   factory Args.parse(
     Iterable<String> input, {
     Map<String, Object?>? defaults,
@@ -20,13 +25,18 @@ abstract interface class Args implements Argv<Map<String, Argv>> {
     list: list,
   );
 
+  /// Positional arguments that were not parsed as options.
   Iterable<String> get rest;
+  /// Positional arguments with basic type coercion applied.
   Iterable<Object?> get args;
 
+  /// Returns a JSON-friendly map representation.
   @override
   Map<String, Object> toJson();
 
+  /// Looks up an option by name.
   Argv? at(String name);
+  /// Shorthand for [at].
   Argv? operator [](String name);
 }
 

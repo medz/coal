@@ -1,11 +1,10 @@
 import 'dart:io';
 
-// ignore: depend_on_referenced_packages
 import 'package:args/args.dart';
-// ignore: depend_on_referenced_packages
 import 'package:args/command_runner.dart';
 import 'package:coal/tab.dart' as coal;
 
+/// Adds a `complete` subcommand that prints shell completion scripts.
 class CompleteCommand extends Command {
   CompleteCommand(this.runner);
 
@@ -61,6 +60,7 @@ extension on CompleteCommand {
   }
 }
 
+/// Registers tab completion definitions on a `CommandRunner`.
 coal.Tab tab(CommandRunner runner) {
   final command = CompleteCommand(runner), tab = command.tab;
   runner.addCommand(command);
