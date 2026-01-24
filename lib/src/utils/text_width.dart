@@ -18,6 +18,7 @@ final _cjktWidePattern = RegExp(
   unicode: true,
 );
 final _tabPattern = RegExp(r'\t{1,1000}');
+String _unicodeProperty(String name) => '\\p{$name}';
 final _emojiPattern = RegExp(
   r'[\u{1F1E6}-\u{1F1FF}]{2}'
   r'|'
@@ -25,9 +26,16 @@ final _emojiPattern = RegExp(
   r'[\u{E0030}-\u{E0039}\u{E0061}-\u{E007A}]{1,3}'
   r'\u{E007F}'
   r'|'
-  r'(?:\p{Emoji}\uFE0F\u20E3?|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation})(?:\u200D(?:\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?|\p{Emoji_Presentation}|\p{Emoji}\uFE0F\u20E3?))*',
+  '(?:${_unicodeProperty('Emoji')}\uFE0F\u20E3?'
+  '|${_unicodeProperty('Emoji_Modifier_Base')}${_unicodeProperty('Emoji_Modifier')}?'
+  '|${_unicodeProperty('Emoji_Presentation')})'
+  '(?:\u200D(?:${_unicodeProperty('Emoji_Modifier_Base')}'
+  '${_unicodeProperty('Emoji_Modifier')}?'
+  '|${_unicodeProperty('Emoji_Presentation')}'
+  '|${_unicodeProperty('Emoji')}\uFE0F\u20E3?))*',
   unicode: true,
 );
+
 final _latinPattern = RegExp(r'(?:[\x20-\x7E\xA0-\xFF](?!\uFE0F)){1,1000}');
 final _modifierPattern = RegExp(r'\p{M}+', unicode: true);
 final _surrogatePairPattern = RegExp(r'[\uD800-\uDBFF][\uDC00-\uDFFF]');

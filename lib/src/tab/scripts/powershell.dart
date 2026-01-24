@@ -124,7 +124,7 @@ String powershellScript(String name, String exec) {
     \$Longest = 0
     [Array]\$Values = \$Out | ForEach-Object {
         # Split the output in name and description
-        \$Name, \$Description = \$_.Split("\`t", 2)
+        \$Name, \$Description = \$_.Split("`t", 2)
         __${name}_debug "Name: \$Name Description: \$Description"
 
         # Look for the longest completion so that we can format things nicely
