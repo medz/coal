@@ -16,13 +16,14 @@ A suite for easily building beautiful command-line apps.
 | [`package:coal/args.dart`](#args-parser) | ✅ | Provides command-line argument parsing functionality. |
 | [`package:coal/utils.dart`](#ansi-utility) | ✅ | Provides utility functions for ANSI escape codes and text manipulation. |
 | [`package:coal/tab.dart`](#tab) | 🚧 | Provides shell command completion and command-line app adapters. |
+| [`package:coal/readline.dart`](#readline) | ✅ | Provides interactive line-input helpers. |
 
 ## Roadmap
 
 - [x] [Args: Command-line argument parsing](#args-parser)
 - [x] [Utils: ANSI utility functions](#ansi-utility)
 - [ ] Keypass: Key input binding
-- [ ] Readline: Input handling
+- [x] [Readline: Input handling](#readline)
 - [ ] Prompt: Basic prompt process support and CLI frame handling
 - [ ] Prompt Utils: Advanced commonly used prompt utilities
 - [x] [Tab: Shell command autocompletion](#core)
@@ -63,6 +64,17 @@ There is a simple TAB demo → [\<TAB\> example](example/README.md#tab)
 > Thanks to [Cobra](https://github.com/spf13/cobra)! for the script and some of the <TAB> implementation references!
 
 <TAB> completion functionality
+
+## Readline
+
+Coal readline provides a lightweight input helper for interactive terminal flows:
+
+```dart
+import 'package:coal/readline.dart';
+
+final readline = Readline();
+final name = readline.readRequired(prompt: 'Name: ');
+```
 
 ## Args Parser
 
