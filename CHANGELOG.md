@@ -1,3 +1,10 @@
+## 0.0.6 - 2026-02-06
+
+- fix(tab): harden completion behavior and add regression tests
+- chore(tab): sync shell completion scripts from upstream cobra v1.10.2
+- ci: add dedicated runtime script workflow and weekly upstream release watcher
+- chore(deps): upgrade `oxy` to ^0.1.0
+
 ## 0.0.5 - 2026-01-24
 
 - chore: relax characters constraint to ^1.4.0
