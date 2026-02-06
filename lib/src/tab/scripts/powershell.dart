@@ -156,8 +156,10 @@ String powershellScript(String name, String exec) {
         \$Space = ""
     }
 
-    if ((\$Directive -band \$ShellCompDirectiveFilterFileExt) -ne 0 ) -or
-       ((\$Directive -band \$ShellCompDirectiveFilterDirs) -ne 0 ))  {
+    if (
+        ((\$Directive -band \$ShellCompDirectiveFilterFileExt) -ne 0 ) -or
+        ((\$Directive -band \$ShellCompDirectiveFilterDirs) -ne 0 )
+    ) {
         __${name}_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
 
         # return here to prevent the completion of the extensions
