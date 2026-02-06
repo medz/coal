@@ -14,6 +14,7 @@ A suite for easily building beautiful command-line apps.
 | Entry | Status | Description |
 |:----:|:----:|:----|
 | [`package:coal/args.dart`](#args-parser) | ✅ | Provides command-line argument parsing functionality. |
+| [`package:coal/keypass.dart`](#keypass) | ✅ | Provides key sequence parsing and binding helpers. |
 | [`package:coal/utils.dart`](#ansi-utility) | ✅ | Provides utility functions for ANSI escape codes and text manipulation. |
 | [`package:coal/tab.dart`](#tab) | 🚧 | Provides shell command completion and command-line app adapters. |
 
@@ -21,7 +22,7 @@ A suite for easily building beautiful command-line apps.
 
 - [x] [Args: Command-line argument parsing](#args-parser)
 - [x] [Utils: ANSI utility functions](#ansi-utility)
-- [ ] Keypass: Key input binding
+- [x] [Keypass: Key input binding](#keypass)
 - [ ] Readline: Input handling
 - [ ] Prompt: Basic prompt process support and CLI frame handling
 - [ ] Prompt Utils: Advanced commonly used prompt utilities
@@ -63,6 +64,22 @@ There is a simple TAB demo → [\<TAB\> example](example/README.md#tab)
 > Thanks to [Cobra](https://github.com/spf13/cobra)! for the script and some of the <TAB> implementation references!
 
 <TAB> completion functionality
+
+## Keypass
+
+Coal keypass provides key sequence parsing and key binding dispatch for terminal flows:
+
+```dart
+import 'package:coal/keypass.dart';
+
+final keypass = Keypass();
+
+keypass.bind('ctrl+c', (_) => print('cancel'));
+keypass.bind('up', (_) => print('history up'));
+
+keypass.handleSequence('\u0003'); // ctrl+c
+keypass.handleSequence('\u001b[A'); // up arrow
+```
 
 ## Args Parser
 
