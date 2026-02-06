@@ -60,6 +60,8 @@ complete.argument('shell', (complete, _) {
 
 There is a simple TAB demo → [\<TAB\> example](example/README.md#tab)
 
+Maintainer reference → [TAB maintenance guide](docs/tab-maintenance.md)
+
 > Thanks to [Cobra](https://github.com/spf13/cobra)! for the script and some of the <TAB> implementation references!
 
 <TAB> completion functionality
