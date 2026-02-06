@@ -1,0 +1,41 @@
+name: Tab Contract
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - lib/src/tab/**
+      - lib/tab/**
+      - test/tab/**
+      - .github/workflows/tab-contract.yml
+  push:
+    branches:
+      - main
+    paths:
+      - lib/src/tab/**
+      - lib/tab/**
+      - test/tab/**
+      - .github/workflows/tab-contract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tab-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Run Tab Contract Tests
+        run: dart test --exclude-tags=script-runtime test/tab
