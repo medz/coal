@@ -104,7 +104,6 @@ String styleText(String text, Iterable<TextStyle> styles) {
           if (match.start + matchedText.length < text.length) {
             if (style.open == TextStyle.dim.open ||
                 style.open == TextStyle.bold.open) {
-              print(1);
               return '$matchedText$escapedOpen';
             }
 

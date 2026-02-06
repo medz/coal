@@ -76,7 +76,7 @@ coal.Tab tab(CommandRunner runner) {
 
   coal.Option createOption(coal.Command command, String name, Option option) {
     if (option.isFlag) {
-      return tab.option(name, option.help ?? '', null, alias: option.abbr);
+      return command.option(name, option.help ?? '', null, alias: option.abbr);
     }
 
     return command.option(
@@ -98,9 +98,10 @@ coal.Tab tab(CommandRunner runner) {
 
   void subCommandCompletions(coal.Command def, Command command) {
     for (final MapEntry(:key, :value) in command.subcommands.entries) {
-      final def = tab.command(key, value.description);
-      optionCompletions(def, value.argParser);
-      subCommandCompletions(def, value);
+      final path = [if (def.value.isNotEmpty) def.value, key].join(' ');
+      final subDef = tab.command(path, value.description);
+      optionCompletions(subDef, value.argParser);
+      subCommandCompletions(subDef, value);
     }
   }
 

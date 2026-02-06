@@ -113,7 +113,7 @@ extension on Tab {
 
         if (!isBool &&
             index < length &&
-            args.elementAt(index).startsWith('-')) {
+            !args.elementAt(index).startsWith('-')) {
           index++;
         }
       } else {
