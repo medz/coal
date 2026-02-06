@@ -1,4 +1,12 @@
-// reference: https://github.com/spf13/cobra/blob/main/bash_completionsV2.go
+// Upstream sync metadata:
+// - repository: https://github.com/spf13/cobra
+// - source file: bash_completionsV2.go
+// - release tag: v1.10.2
+// - release date: 2025-12-04
+// - tag commit: 88b30ab89da2d0d0abb153818746c5a2d30eccec
+// - synced at (UTC): 2026-02-06T14:01:17Z
+// Sync policy: only sync from upstream released tags (never main/dev branches).
+// Reference: https://github.com/spf13/cobra/blob/v1.10.2/bash_completionsV2.go
 
 import '../flags.dart';
 import '_utils.dart';

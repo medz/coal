@@ -1,4 +1,12 @@
-// reference: https://github.com/spf13/cobra/blob/main/fish_completions.go
+// Upstream sync metadata:
+// - repository: https://github.com/spf13/cobra
+// - source file: fish_completions.go
+// - release tag: v1.10.2
+// - release date: 2025-12-04
+// - tag commit: 88b30ab89da2d0d0abb153818746c5a2d30eccec
+// - synced at (UTC): 2026-02-06T14:01:17Z
+// Sync policy: only sync from upstream released tags (never main/dev branches).
+// Reference: https://github.com/spf13/cobra/blob/v1.10.2/fish_completions.go
 
 import '../flags.dart';
 import '_utils.dart';
@@ -38,7 +46,7 @@ function __${escapedName}_perform_completion
     __${escapedName}_debug "Last arg: \$last_arg"
 
     # Call the completion program and get the results
-    set -l requestComp "$exec complete -- "(string join ' ' -- (string escape -- \$args[2..-1]))" \$last_arg"
+    set -l requestComp "$exec complete -- \$args[2..-1] \$last_arg"
     __${escapedName}_debug "Calling \$requestComp"
     set -l results (eval \$requestComp 2> /dev/null)
 

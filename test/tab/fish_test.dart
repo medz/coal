@@ -8,7 +8,12 @@ void main() {
     test('should include updated directive and request handling', () {
       final script = Shell.fish.generate(name, exec);
 
-      expect(script, contains('set -l requestComp "$exec complete -- "'));
+      expect(
+        script,
+        contains(
+          'set -l requestComp "$exec complete -- \$args[2..-1] \$last_arg"',
+        ),
+      );
       expect(
         script,
         contains(
