@@ -121,6 +121,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  ht:
+    dependency: transitive
+    description:
+      name: ht
+      sha256: f0d7413cb63e471d989e551b8eb05496fdec5a1c7596e5177669b1cf717882f1
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -201,14 +209,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  ocookie:
+    dependency: transitive
+    description:
+      name: ocookie
+      sha256: b3dd5f8abe623e13a4ca88f0de90dd3309fca3b70652eff1a3a11a648ee20edb
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   oxy:
     dependency: "direct dev"
     description:
       name: oxy
-      sha256: "00f89b18c9559196f9c057008b0173af2e6d8f77f28bc401c20afb160b7f812b"
+      sha256: "577b4972e0e1095e2b3925c7017e3e2df79a6143c7ae463d5b855de63774c8af"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.4"
+    version: "0.1.0"
   package_config:
     dependency: transitive
     description:
@@ -426,4 +442,4 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.9.2 <4.0.0"
+  dart: ">=3.10.0 <4.0.0"
