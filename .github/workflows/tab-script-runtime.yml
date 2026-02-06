@@ -16,12 +16,17 @@ on:
       - test/tab/**
       - .github/workflows/tab-script-runtime.yml
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
 
 permissions:
   contents: read
 
 jobs:
   runtime:
+    if: >
+      (github.event_name == 'schedule' && matrix.cadence == 'weekly') ||
+      (github.event_name != 'schedule' && matrix.cadence == 'default')
     name: runtime (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -31,10 +36,13 @@ jobs:
         include:
           - os: ubuntu-latest
             required_shells: bash,zsh,fish,pwsh
-          - os: macos-latest
-            required_shells: bash,zsh
+            cadence: default
           - os: windows-latest
             required_shells: pwsh
+            cadence: default
+          - os: macos-latest
+            required_shells: bash,zsh
+            cadence: weekly
     env:
       COAL_REQUIRED_SHELLS: ${{ matrix.required_shells }}
 
