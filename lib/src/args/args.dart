@@ -27,6 +27,7 @@ abstract interface class Args implements Argv<Map<String, Argv>> {
 
   /// Positional arguments that were not parsed as options.
   Iterable<String> get rest;
+
   /// Positional arguments with basic type coercion applied.
   Iterable<Object?> get args;
 
@@ -36,6 +37,7 @@ abstract interface class Args implements Argv<Map<String, Argv>> {
 
   /// Looks up an option by name.
   Argv? at(String name);
+
   /// Shorthand for [at].
   Argv? operator [](String name);
 }
