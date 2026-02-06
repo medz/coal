@@ -46,10 +46,11 @@ __${escapedName}_complete() {
     out=\$(eval "\$requestComp" 2>/dev/null)
 
     # Extract directive if present
-    directive=0
-    if [[ "\$out" == *:* ]]; then
-        directive=\${out##*:}
-        out=\${out%:*}
+    directive=\${out##*:}
+    out=\${out%:*}
+    if [[ "\$directive" == "\$out" ]]; then
+        # There is no directive specified.
+        directive=0
     fi
 
     # Process completions based on directive
@@ -58,15 +59,31 @@ __${escapedName}_complete() {
         return
     fi
 
+    # When completing a flag with an = (e.g., --name=<TAB>)
+    # bash focuses on the part after the =.
+    if [[ "\$cur" == -*=* ]]; then
+        cur="\${cur#*=}"
+    fi
+
     # Apply directives
     if [[ \$((directive & \$ShellCompDirectiveNoSpace)) -ne 0 ]]; then
-        compopt -o nospace
+        if [[ \$(type -t compopt) == builtin ]]; then
+            compopt -o nospace
+        fi
     fi
     if [[ \$((directive & \$ShellCompDirectiveKeepOrder)) -ne 0 ]]; then
-        compopt -o nosort
+        if [[ \$(type -t compopt) == builtin ]]; then
+            # no sort isn't supported for bash < 4.4
+            if [[ \${BASH_VERSINFO[0]} -gt 4 ||
+                ( \${BASH_VERSINFO[0]} -eq 4 && \${BASH_VERSINFO[1]} -ge 4 ) ]]; then
+                compopt -o nosort
+            fi
+        fi
     fi
     if [[ \$((directive & \$ShellCompDirectiveNoFileComp)) -ne 0 ]]; then
-        compopt +o default
+        if [[ \$(type -t compopt) == builtin ]]; then
+            compopt +o default
+        fi
     fi
 
     # Handle file extension filtering

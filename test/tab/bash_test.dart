@@ -43,6 +43,10 @@ void main() {
           'if [[ \$((directive & \$ShellCompDirectiveFilterDirs)) -ne 0 ]]',
         ),
       );
+      expect(script, contains('if [[ "\$directive" == "\$out" ]]; then'));
+      expect(script, contains('if [[ "\$cur" == -*=* ]]; then'));
+      expect(script, contains('if [[ \$(type -t compopt) == builtin ]]; then'));
+      expect(script, contains('\${BASH_VERSINFO[0]} -gt 4'));
     });
 
     test('should handle special characters in the name', () {
