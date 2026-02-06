@@ -1,10 +1,21 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:coal/readline.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('readline', () {
+    test('stdio shortcut uses process stdio defaults', () {
+      final readline = Readline.stdio();
+      expect(readline.encoding, systemEncoding);
+    });
+
+    test('stdio shortcut allows overriding encoding', () {
+      final readline = Readline.stdio(encoding: utf8);
+      expect(readline.encoding, utf8);
+    });
+
     test('prints prompt and trims input by default', () {
       final writes = <Object?>[];
       final readline = Readline(

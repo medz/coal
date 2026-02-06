@@ -12,6 +12,9 @@ class Readline {
       _writer = writer ?? stdout.write,
       encoding = encoding ?? systemEncoding;
 
+  /// Creates a readline instance wired to process stdio.
+  Readline.stdio({Encoding? encoding}) : this(encoding: encoding);
+
   final ReadlineReader _reader;
   final ReadlineWriter _writer;
   final Encoding encoding;

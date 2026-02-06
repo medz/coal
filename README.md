@@ -72,7 +72,7 @@ Coal readline provides a lightweight input helper for interactive terminal flows
 ```dart
 import 'package:coal/readline.dart';
 
-final readline = Readline();
+final readline = Readline.stdio();
 final name = readline.readRequired(prompt: 'Name: ');
 ```
 
