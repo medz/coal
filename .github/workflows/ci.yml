@@ -34,4 +34,4 @@ jobs:
         run: dart analyze
 
       - name: Run Tests
-        run: dart test
+        run: dart test --exclude-tags=script-runtime

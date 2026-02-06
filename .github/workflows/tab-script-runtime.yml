@@ -1,0 +1,53 @@
+name: Tab Script Runtime
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - lib/src/tab/**
+      - test/tab/**
+      - .github/workflows/tab-script-runtime.yml
+  push:
+    branches:
+      - main
+    paths:
+      - lib/src/tab/**
+      - test/tab/**
+      - .github/workflows/tab-script-runtime.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COAL_REQUIRE_ALL_SHELLS: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install Shell Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh fish
+
+      - name: Verify PowerShell
+        run: |
+          if ! command -v pwsh >/dev/null 2>&1; then
+            echo "pwsh is required but not available on this runner."
+            exit 1
+          fi
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Run Script Runtime Tests
+        run: dart test --tags=script-runtime

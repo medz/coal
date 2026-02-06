@@ -1,3 +1,6 @@
+@Tags(['script-runtime'])
+library;
+
 import 'dart:io';
 
 import 'package:coal/tab.dart';
@@ -31,8 +34,34 @@ void main() {
   final hasZsh = hasCommand('zsh');
   final hasFish = hasCommand('fish');
   final hasPwsh = hasCommand('pwsh');
+  final requireAllShells =
+      Platform.environment['COAL_REQUIRE_ALL_SHELLS'] == 'true';
 
   group('tab script runtime', () {
+    test('required shells are available when strict mode is enabled', () {
+      if (!requireAllShells) return;
+      expect(
+        hasBash,
+        isTrue,
+        reason: 'bash is required for strict runtime checks',
+      );
+      expect(
+        hasZsh,
+        isTrue,
+        reason: 'zsh is required for strict runtime checks',
+      );
+      expect(
+        hasFish,
+        isTrue,
+        reason: 'fish is required for strict runtime checks',
+      );
+      expect(
+        hasPwsh,
+        isTrue,
+        reason: 'pwsh is required for strict runtime checks',
+      );
+    });
+
     test('bash script passes syntax check', () async {
       final tmp = await Directory.systemTemp.createTemp(
         'coal-tab-bash-syntax-',
@@ -46,32 +75,34 @@ void main() {
       final result = await Process.run('bash', ['-n', script.path]);
 
       expect(result.exitCode, 0, reason: 'bash -n failed: ${result.stderr}');
-    }, skip: !hasBash);
+    }, skip: !hasBash && !requireAllShells);
 
-    test('bash script executes completion flow end-to-end', () async {
-      final tmp = await Directory.systemTemp.createTemp(
-        'coal-tab-bash-runtime-',
-      );
-      addTearDown(() => tmp.delete(recursive: true));
+    test(
+      'bash script executes completion flow end-to-end',
+      () async {
+        final tmp = await Directory.systemTemp.createTemp(
+          'coal-tab-bash-runtime-',
+        );
+        addTearDown(() => tmp.delete(recursive: true));
 
-      final backend = await writeScript(
-        '${tmp.path}/mock_complete.sh',
-        '''#!/usr/bin/env bash
+        final backend = await writeScript(
+          '${tmp.path}/mock_complete.sh',
+          '''#!/usr/bin/env bash
 if [[ "\$1" == "complete" && "\$2" == "--" ]]; then
   printf '%s\n' '--name\tName option' ':0'
   exit 0
 fi
 exit 1
 ''',
-        executable: true,
-      );
+          executable: true,
+        );
 
-      final script = await writeScript(
-        '${tmp.path}/coaltest.bash',
-        Shell.bash.generate('coaltest', backend.path),
-      );
+        final script = await writeScript(
+          '${tmp.path}/coaltest.bash',
+          Shell.bash.generate('coaltest', backend.path),
+        );
 
-      final harness = r'''
+        final harness = r'''
 set -euo pipefail
 
 _get_comp_words_by_ref() {
@@ -97,24 +128,26 @@ __coaltest_complete
 printf '%s\n' "${COMPREPLY[@]}"
 ''';
 
-      final result = await Process.run(
-        'bash',
-        ['-lc', harness],
-        environment: {'COMPLETION_FILE': script.path},
-      );
+        final result = await Process.run(
+          'bash',
+          ['-lc', harness],
+          environment: {'COMPLETION_FILE': script.path},
+        );
 
-      expect(
-        result.exitCode,
-        0,
-        reason: 'bash runtime failed: ${result.stderr}',
-      );
-      final output = (result.stdout as String)
-          .split('\n')
-          .map((line) => line.trim())
-          .where((line) => line.isNotEmpty)
-          .toList();
-      expect(output, contains('--name'));
-    }, skip: !hasBash);
+        expect(
+          result.exitCode,
+          0,
+          reason: 'bash runtime failed: ${result.stderr}',
+        );
+        final output = (result.stdout as String)
+            .split('\n')
+            .map((line) => line.trim())
+            .where((line) => line.isNotEmpty)
+            .toList();
+        expect(output, contains('--name'));
+      },
+      skip: !hasBash && !requireAllShells,
+    );
 
     test('zsh script passes syntax check', () async {
       final tmp = await Directory.systemTemp.createTemp('coal-tab-zsh-syntax-');
@@ -127,7 +160,7 @@ printf '%s\n' "${COMPREPLY[@]}"
       final result = await Process.run('zsh', ['-n', script.path]);
 
       expect(result.exitCode, 0, reason: 'zsh -n failed: ${result.stderr}');
-    }, skip: !hasZsh);
+    }, skip: !hasZsh && !requireAllShells);
 
     test('fish script passes syntax check', () async {
       final tmp = await Directory.systemTemp.createTemp(
@@ -146,26 +179,34 @@ printf '%s\n' "${COMPREPLY[@]}"
         0,
         reason: 'fish --no-execute failed: ${result.stderr}',
       );
-    }, skip: !hasFish);
+    }, skip: !hasFish && !requireAllShells);
 
-    test('powershell script loads without parser errors', () async {
-      final tmp = await Directory.systemTemp.createTemp(
-        'coal-tab-pwsh-syntax-',
-      );
-      addTearDown(() => tmp.delete(recursive: true));
+    test(
+      'powershell script loads without parser errors',
+      () async {
+        final tmp = await Directory.systemTemp.createTemp(
+          'coal-tab-pwsh-syntax-',
+        );
+        addTearDown(() => tmp.delete(recursive: true));
 
-      final script = await writeScript(
-        '${tmp.path}/coaltest.ps1',
-        Shell.powershell.generate('coaltest', '/tmp/mock-complete'),
-      );
-      final result = await Process.run('pwsh', [
-        '-NoProfile',
-        '-NonInteractive',
-        '-File',
-        script.path,
-      ]);
+        final script = await writeScript(
+          '${tmp.path}/coaltest.ps1',
+          Shell.powershell.generate('coaltest', '/tmp/mock-complete'),
+        );
+        final result = await Process.run('pwsh', [
+          '-NoProfile',
+          '-NonInteractive',
+          '-File',
+          script.path,
+        ]);
 
-      expect(result.exitCode, 0, reason: 'pwsh load failed: ${result.stderr}');
-    }, skip: !hasPwsh);
+        expect(
+          result.exitCode,
+          0,
+          reason: 'pwsh load failed: ${result.stderr}',
+        );
+      },
+      skip: !hasPwsh && !requireAllShells,
+    );
   });
 }
