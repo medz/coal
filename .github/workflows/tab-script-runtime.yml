@@ -22,10 +22,21 @@ permissions:
 
 jobs:
   runtime:
-    runs-on: ubuntu-latest
+    name: runtime (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            required_shells: bash,zsh,fish,pwsh
+          - os: macos-latest
+            required_shells: bash,zsh
+          - os: windows-latest
+            required_shells: pwsh
     env:
-      COAL_REQUIRE_ALL_SHELLS: "true"
+      COAL_REQUIRED_SHELLS: ${{ matrix.required_shells }}
 
     steps:
       - name: Checkout
@@ -34,17 +45,11 @@ jobs:
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
 
-      - name: Install Shell Dependencies
+      - name: Install Shell Dependencies (Ubuntu)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y zsh fish
-
-      - name: Verify PowerShell
-        run: |
-          if ! command -v pwsh >/dev/null 2>&1; then
-            echo "pwsh is required but not available on this runner."
-            exit 1
-          fi
 
       - name: Install Dependencies
         run: dart pub get

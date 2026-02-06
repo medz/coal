@@ -34,32 +34,29 @@ void main() {
   final hasZsh = hasCommand('zsh');
   final hasFish = hasCommand('fish');
   final hasPwsh = hasCommand('pwsh');
-  final requireAllShells =
-      Platform.environment['COAL_REQUIRE_ALL_SHELLS'] == 'true';
+  final requiredShells =
+      (Platform.environment['COAL_REQUIRED_SHELLS'] ?? '')
+          .split(',')
+          .map((shell) => shell.trim().toLowerCase())
+          .where((shell) => shell.isNotEmpty)
+          .toSet();
+  final availability = {
+    'bash': hasBash,
+    'zsh': hasZsh,
+    'fish': hasFish,
+    'pwsh': hasPwsh,
+  };
 
   group('tab script runtime', () {
-    test('required shells are available when strict mode is enabled', () {
-      if (!requireAllShells) return;
-      expect(
-        hasBash,
-        isTrue,
-        reason: 'bash is required for strict runtime checks',
-      );
-      expect(
-        hasZsh,
-        isTrue,
-        reason: 'zsh is required for strict runtime checks',
-      );
-      expect(
-        hasFish,
-        isTrue,
-        reason: 'fish is required for strict runtime checks',
-      );
-      expect(
-        hasPwsh,
-        isTrue,
-        reason: 'pwsh is required for strict runtime checks',
-      );
+    test('required shells are available when configured', () {
+      for (final shell in requiredShells) {
+        expect(
+          availability[shell] == true,
+          isTrue,
+          reason:
+              '$shell is required by COAL_REQUIRED_SHELLS but not available',
+        );
+      }
     });
 
     test('bash script passes syntax check', () async {
@@ -75,7 +72,7 @@ void main() {
       final result = await Process.run('bash', ['-n', script.path]);
 
       expect(result.exitCode, 0, reason: 'bash -n failed: ${result.stderr}');
-    }, skip: !hasBash && !requireAllShells);
+    }, skip: !hasBash);
 
     test(
       'bash script executes completion flow end-to-end',
@@ -146,7 +143,7 @@ printf '%s\n' "${COMPREPLY[@]}"
             .toList();
         expect(output, contains('--name'));
       },
-      skip: !hasBash && !requireAllShells,
+      skip: !hasBash,
     );
 
     test('zsh script passes syntax check', () async {
@@ -160,7 +157,7 @@ printf '%s\n' "${COMPREPLY[@]}"
       final result = await Process.run('zsh', ['-n', script.path]);
 
       expect(result.exitCode, 0, reason: 'zsh -n failed: ${result.stderr}');
-    }, skip: !hasZsh && !requireAllShells);
+    }, skip: !hasZsh);
 
     test('fish script passes syntax check', () async {
       final tmp = await Directory.systemTemp.createTemp(
@@ -179,7 +176,7 @@ printf '%s\n' "${COMPREPLY[@]}"
         0,
         reason: 'fish --no-execute failed: ${result.stderr}',
       );
-    }, skip: !hasFish && !requireAllShells);
+    }, skip: !hasFish);
 
     test(
       'powershell script loads without parser errors',
@@ -206,7 +203,7 @@ printf '%s\n' "${COMPREPLY[@]}"
           reason: 'pwsh load failed: ${result.stderr}',
         );
       },
-      skip: !hasPwsh && !requireAllShells,
+      skip: !hasPwsh,
     );
   });
 }
