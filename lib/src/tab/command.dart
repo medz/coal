@@ -1,5 +1,6 @@
 /// Adds a single completion entry.
 typedef Complete = void Function(String value, String description);
+
 /// Provides completion entries for an argument or option.
 typedef CompleteHandler =
     void Function(Complete complete, Map<String, Option> options);

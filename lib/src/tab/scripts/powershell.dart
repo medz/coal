@@ -1,4 +1,12 @@
-// Reference: https://github.com/spf13/cobra/blob/main/powershell_completions.go
+// Upstream sync metadata:
+// - repository: https://github.com/spf13/cobra
+// - source file: powershell_completions.go
+// - release tag: v1.10.2
+// - release date: 2025-12-04
+// - tag commit: 88b30ab89da2d0d0abb153818746c5a2d30eccec
+// - synced at (UTC): 2026-02-06T14:01:17Z
+// Sync policy: only sync from upstream released tags (never main/dev branches).
+// Reference: https://github.com/spf13/cobra/blob/v1.10.2/powershell_completions.go
 
 import '../flags.dart';
 import '_utils.dart';
@@ -148,8 +156,10 @@ String powershellScript(String name, String exec) {
         \$Space = ""
     }
 
-    if ((\$Directive -band \$ShellCompDirectiveFilterFileExt) -ne 0 ) -or
-       ((\$Directive -band \$ShellCompDirectiveFilterDirs) -ne 0 ))  {
+    if (
+        ((\$Directive -band \$ShellCompDirectiveFilterFileExt) -ne 0 ) -or
+        ((\$Directive -band \$ShellCompDirectiveFilterDirs) -ne 0 )
+    ) {
         __${name}_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
 
         # return here to prevent the completion of the extensions
@@ -215,7 +225,12 @@ String powershellScript(String name, String exec) {
                     __${name}_debug "Only one completion left"
 
                     # insert space after value
-                    [System.Management.Automation.CompletionResult]::new(\$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
+                    \$CompletionText = \$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space
+                    if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
+                        [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
+                    } else {
+                        \$CompletionText
+                    }
 
                 } else {
                     # Add the proper number of spaces to align the descriptions
@@ -230,7 +245,12 @@ String powershellScript(String name, String exec) {
                         \$Description = "  (\$(\$comp.Description))"
                     }
 
-                    [System.Management.Automation.CompletionResult]::new("\$(\$comp.Name)\$Description", "\$(\$comp.Name)\$Description", 'ParameterValue', "\$(\$comp.Description)")
+                    \$CompletionText = "\$(\$comp.Name)\$Description"
+                    if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
+                        [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)\$Description", 'ParameterValue', "\$(\$comp.Description)")
+                    } else {
+                        \$CompletionText
+                    }
                 }
              }
 
@@ -239,7 +259,12 @@ String powershellScript(String name, String exec) {
                 # insert space after value
                 # MenuComplete will automatically show the ToolTip of
                 # the highlighted value at the bottom of the suggestions.
-                [System.Management.Automation.CompletionResult]::new(\$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
+                \$CompletionText = \$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space
+                if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
+                    [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
+                } else {
+                    \$CompletionText
+                }
             }
 
             # TabCompleteNext and in case we get something unknown
@@ -247,7 +272,12 @@ String powershellScript(String name, String exec) {
                 # Like MenuComplete but we don't want to add a space here because
                 # the user need to press space anyway to get the completion.
                 # Description will not be shown because that's not possible with TabCompleteNext
-                [System.Management.Automation.CompletionResult]::new(\$(\$comp.Name | __${name}_escapeStringWithSpecialChars), "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
+                \$CompletionText = \$(\$comp.Name | __${name}_escapeStringWithSpecialChars)
+                if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
+                    [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
+                } else {
+                    \$CompletionText
+                }
             }
         }
 

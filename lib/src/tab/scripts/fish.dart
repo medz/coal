@@ -1,4 +1,12 @@
-// reference: https://github.com/spf13/cobra/blob/main/bash_completionsV2.go
+// Upstream sync metadata:
+// - repository: https://github.com/spf13/cobra
+// - source file: fish_completions.go
+// - release tag: v1.10.2
+// - release date: 2025-12-04
+// - tag commit: 88b30ab89da2d0d0abb153818746c5a2d30eccec
+// - synced at (UTC): 2026-02-06T14:01:17Z
+// Sync policy: only sync from upstream released tags (never main/dev branches).
+// Reference: https://github.com/spf13/cobra/blob/v1.10.2/fish_completions.go
 
 import '../flags.dart';
 import '_utils.dart';
@@ -30,23 +38,15 @@ end
 function __${escapedName}_perform_completion
     __${escapedName}_debug "Starting __${escapedName}_perform_completion"
 
-    # Extract all args except the completion flag
-    set -l args (string match -v -- "--completion=" (commandline -opc))
+    # Extract all args and the current token.
+    set -l args (commandline -opc)
+    set -l last_arg (string escape -- (commandline -ct))
 
-    # Extract the current token being completed
-    set -l current_token (commandline -ct)
-
-    # Check if current token starts with a dash
-    set -l flag_prefix ""
-    if string match -q -- "-*" \$current_token
-        set flag_prefix "--flag="
-    end
-
-    __${escapedName}_debug "Current token: \$current_token"
-    __${escapedName}_debug "All args: \$args"
+    __${escapedName}_debug "Args: \$args"
+    __${escapedName}_debug "Last arg: \$last_arg"
 
     # Call the completion program and get the results
-    set -l requestComp "$exec complete -- \$args"
+    set -l requestComp "$exec complete -- \$args[2..-1] \$last_arg"
     __${escapedName}_debug "Calling \$requestComp"
     set -l results (eval \$requestComp 2> /dev/null)
 
@@ -54,36 +54,47 @@ function __${escapedName}_perform_completion
     # Let's ignore them or else it will break completion.
     # Ref: https://github.com/spf13/cobra/issues/1279
     for line in \$results[-1..1]
-        if test (string sub -s 1 -l 1 -- \$line) = ":"
-            # The directive
-            set -l directive (string sub -s 2 -- \$line)
-            set -l directive_num (math \$directive)
+        if test (string trim -- \$line) = ""
+            set results \$results[1..-2]
+        else
             break
         end
     end
 
-    # No directive specified, use default
-    if not set -q directive_num
-        set directive_num 0
+    # No completions, let fish handle file completions.
+    if test (count \$results) -eq 0
+        __${escapedName}_debug "No completions, performing file completion"
+        return 1
     end
 
+    # Parse directive line.
+    set -l directive_num 0
+    if test (string sub -s 1 -l 1 -- \$results[-1]) = ":"
+        set -l directive (string sub -s 2 -- \$results[-1])
+        if test -n "\$directive"
+            set directive_num (math \$directive)
+        end
+        set results \$results[1..-2]
+    end
+
+    # For fish, when completing a flag with an = (e.g., --name=<TAB>)
+    # completions must be prefixed with the flag.
+    set -l flag_prefix (string match -r -- '-.*=' "\$last_arg")
+
     __${escapedName}_debug "Directive: \$directive_num"
+    __${escapedName}_debug "Completions: \$results"
+    __${escapedName}_debug "Flag prefix: \$flag_prefix"
 
     # Process completions based on directive
-    if test \$directive_num -eq \$ShellCompDirectiveError
+    if test (math "\$directive_num & \$ShellCompDirectiveError") -ne 0
         # Error code. No completion.
         __${escapedName}_debug "Received error directive: aborting."
         return 1
     end
 
-    # Filter out the directive (last line)
-    if test (count \$results) -gt 0 -a (string sub -s 1 -l 1 -- \$results[-1]) = ":"
-        set results \$results[1..-2]
-    end
-
     # No completions, let fish handle file completions unless forbidden
     if test (count \$results) -eq 0
-        if test \$directive_num -ne \$ShellCompDirectiveNoFileComp
+        if test (math "\$directive_num & \$ShellCompDirectiveNoFileComp") -eq 0
             __${escapedName}_debug "No completions, performing file completion"
             return 1
         end
@@ -91,44 +102,10 @@ function __${escapedName}_perform_completion
         return 0
     end
 
-    # Filter file extensions
-    if test \$directive_num -eq \$ShellCompDirectiveFilterFileExt
-        __${escapedName}_debug "File extension filtering"
-        set -l file_extensions
-        for item in \$results
-            if test -n "\$item" -a (string sub -s 1 -l 1 -- \$item) != "-"
-                set -a file_extensions "*\$item"
-            end
-        end
-        __${escapedName}_debug "File extensions: \$file_extensions"
-
-        # Use the file extensions as completions
-        set -l completions
-        for ext in \$file_extensions
-            # Get all files matching the extension
-            set -a completions (string replace -r '^.*/' '' -- \$ext)
-        end
-
-        for item in \$completions
-            echo -e "\$item\t"
-        end
-        return 0
-    end
-
-    # Filter directories
-    if test \$directive_num -eq \$ShellCompDirectiveFilterDirs
-        __${escapedName}_debug "Directory filtering"
-        set -l dirs
-        for item in \$results
-            if test -d "\$item"
-                set -a dirs "\$item/"
-            end
-        end
-
-        for item in \$dirs
-            echo -e "\$item\t"
-        end
-        return 0
+    # Fish doesn't support extension or directory filtering directives.
+    if test (math "\$directive_num & \$ShellCompDirectiveFilterFileExt") -ne 0; or test (math "\$directive_num & \$ShellCompDirectiveFilterDirs") -ne 0
+        __${escapedName}_debug "File extension filtering or directory filtering not supported"
+        return 1
     end
 
     # Process remaining completions
@@ -136,15 +113,15 @@ function __${escapedName}_perform_completion
         if test -n "\$item"
             # Check if the item has a description
             if string match -q "*\t*" -- "\$item"
-                set -l completion_parts (string split \t -- "\$item")
+                set -l completion_parts (string split --max 1 \t -- "\$item")
                 set -l comp \$completion_parts[1]
                 set -l desc \$completion_parts[2]
 
                 # Add the completion and description
-                echo -e "\$comp\t\$desc"
+                echo -e "\$flag_prefix\$comp\t\$desc"
             else
                 # Add just the completion
-                echo -e "\$item\t"
+                echo -e "\$flag_prefix\$item\t"
             end
         end
     end

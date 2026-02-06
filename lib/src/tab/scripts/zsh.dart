@@ -1,4 +1,12 @@
-// Reference: https://github.com/spf13/cobra/blob/main/zsh_completions.go
+// Upstream sync metadata:
+// - repository: https://github.com/spf13/cobra
+// - source file: zsh_completions.go
+// - release tag: v1.10.2
+// - release date: 2025-12-04
+// - tag commit: 88b30ab89da2d0d0abb153818746c5a2d30eccec
+// - synced at (UTC): 2026-02-06T14:01:17Z
+// Sync policy: only sync from upstream released tags (never main/dev branches).
+// Reference: https://github.com/spf13/cobra/blob/v1.10.2/zsh_completions.go
 
 import '../flags.dart';
 import '_utils.dart';
@@ -194,7 +202,7 @@ _$escapedName() {
         return \$result
     else
         __${escapedName}_debug "Calling _describe"
-        if eval _describe \$keepOrder "completions" completions -Q \${flagPrefix} \${noSpace}; then
+        if eval _describe \$keepOrder "completions" completions \${flagPrefix} \${noSpace}; then
             __${escapedName}_debug "_describe found some completions"
 
             # Return the success of having called _describe
@@ -205,10 +213,9 @@ _$escapedName() {
             if [ \$((directive & shellCompDirectiveNoFileComp)) -ne 0 ]; then
                 __${escapedName}_debug "deactivating file completion"
 
-                # Return 0 to indicate completion is finished and prevent zsh from
-                # trying other completion algorithms (which could cause hanging).
-                # We use NoFileComp directive to explicitly disable file completion.
-                return 0
+                # We must return an error code here to let zsh know there were no
+                # completions from _describe; this allows other matching algorithms.
+                return 1
             else
                 # Perform file completion
                 __${escapedName}_debug "Activating file completion"
@@ -221,7 +228,7 @@ _$escapedName() {
     fi
 }
 
-# don't run the completion function when being sourced or eval-ed
+# don't run the completion function when being source-ed or eval-ed
 if [ "\${funcstack[1]}" = "_$escapedName" ]; then
     _$escapedName
 fi

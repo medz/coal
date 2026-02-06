@@ -1,0 +1,153 @@
+name: Upstream Cobra Watch
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-upstream:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check Upstream Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = 'lib/src/tab/scripts/bash.dart';
+            const issueLabel = 'upstream-cobra-watch';
+            const issueMarker = '<!-- upstream-cobra-watch -->';
+            const titlePrefix = '[Upstream Watch] Cobra completion scripts update';
+
+            const localContent = fs.readFileSync(path, 'utf8');
+            const localTagMatch = localContent.match(/release tag:\s*(v\d+\.\d+\.\d+)/);
+            if (!localTagMatch) {
+              core.setFailed(`Unable to find local tracked release tag from ${path}`);
+              return;
+            }
+            const localTag = localTagMatch[1];
+
+            function parseSemver(tag) {
+              const clean = String(tag).trim().replace(/^v/, '');
+              const parts = clean.split('.').map((part) => Number.parseInt(part, 10));
+              if (parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
+                throw new Error(`Unsupported semver format: ${tag}`);
+              }
+              return parts.slice(0, 3);
+            }
+
+            function compareSemver(a, b) {
+              const [a1, a2, a3] = parseSemver(a);
+              const [b1, b2, b3] = parseSemver(b);
+              if (a1 !== b1) return a1 > b1 ? 1 : -1;
+              if (a2 !== b2) return a2 > b2 ? 1 : -1;
+              if (a3 !== b3) return a3 > b3 ? 1 : -1;
+              return 0;
+            }
+
+            const latestRelease = await github.request(
+              'GET /repos/{owner}/{repo}/releases/latest',
+              {
+                owner: 'spf13',
+                repo: 'cobra',
+              },
+            );
+            const latest = latestRelease.data;
+            const latestTag = latest.tag_name;
+
+            core.info(`Local tracked Cobra release: ${localTag}`);
+            core.info(`Latest upstream Cobra release: ${latestTag}`);
+
+            if (compareSemver(latestTag, localTag) <= 0) {
+              core.info('No newer upstream release. Skipping issue management.');
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const labels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner,
+              repo,
+              per_page: 100,
+            });
+            const hasLabel = labels.some((label) => label.name === issueLabel);
+            if (!hasLabel) {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: issueLabel,
+                color: '0e8a16',
+                description: 'Tracks upstream Cobra release updates for tab scripts',
+              });
+              core.info(`Created label: ${issueLabel}`);
+            }
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'all',
+              labels: issueLabel,
+              per_page: 100,
+            });
+
+            const managedIssue = issues.find(
+              (issue) => !issue.pull_request && issue.body?.includes(issueMarker),
+            );
+            const title = `${titlePrefix}: ${latestTag}`;
+            const body = [
+              issueMarker,
+              'A newer upstream Cobra release is available for completion scripts.',
+              '',
+              `- Local tracked release: \`${localTag}\``,
+              `- Latest upstream release: \`${latestTag}\``,
+              `- Upstream release date: \`${latest.published_at}\``,
+              `- Upstream release notes: ${latest.html_url}`,
+              '- Check source files: `bash_completionsV2.go`, `zsh_completions.go`, `fish_completions.go`, `powershell_completions.go`',
+              '',
+              'Action required:',
+              '1. Review upstream script changes in the new release tag.',
+              '2. Sync `lib/src/tab/scripts/*.dart` if needed.',
+              '3. Update sync metadata comments and tests.',
+              '',
+              'This issue is auto-managed by `.github/workflows/upstream-cobra-watch.yml`.',
+            ].join('\n');
+
+            if (!managedIssue) {
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+                labels: [issueLabel],
+              });
+              core.info('Created upstream watch issue.');
+              return;
+            }
+
+            const alreadyUpToDate = managedIssue.body?.includes(
+              `Latest upstream release: \`${latestTag}\``,
+            );
+            if (alreadyUpToDate) {
+              core.info('Managed issue already points to the latest release. Skipping.');
+              return;
+            }
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: managedIssue.number,
+              title,
+              body,
+              state: 'open',
+            });
+            core.info(`Updated managed issue #${managedIssue.number} for ${latestTag}.`);

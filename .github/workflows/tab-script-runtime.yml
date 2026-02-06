@@ -1,0 +1,66 @@
+name: Tab Script Runtime
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - lib/src/tab/**
+      - test/tab/**
+      - .github/workflows/tab-script-runtime.yml
+  push:
+    branches:
+      - main
+    paths:
+      - lib/src/tab/**
+      - test/tab/**
+      - .github/workflows/tab-script-runtime.yml
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    if: >
+      (github.event_name == 'schedule' && matrix.cadence == 'weekly') ||
+      (github.event_name != 'schedule' && matrix.cadence == 'default')
+    name: runtime (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            required_shells: bash,zsh,fish,pwsh
+            cadence: default
+          - os: windows-latest
+            required_shells: pwsh
+            cadence: default
+          - os: macos-latest
+            required_shells: bash,zsh
+            cadence: weekly
+    env:
+      COAL_REQUIRED_SHELLS: ${{ matrix.required_shells }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install Shell Dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh fish
+
+      - name: Install Dependencies
+        run: dart pub get
+
+      - name: Run Script Runtime Tests
+        run: dart test --tags=script-runtime
