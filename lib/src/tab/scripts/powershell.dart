@@ -125,7 +125,7 @@ String powershellScript(String name, String exec) {
 
     if ((\$Directive -band \$ShellCompDirectiveError) -ne 0 ) {
         # Error code.  No completion.
-        __${name}_debug "Received error from custom completion go code"
+        __${name}_debug "Received error from custom completion code"
         return
     }
 

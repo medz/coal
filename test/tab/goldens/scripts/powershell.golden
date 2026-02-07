@@ -110,7 +110,7 @@
 
     if (($Directive -band $ShellCompDirectiveError) -ne 0 ) {
         # Error code.  No completion.
-        __coaltest_debug "Received error from custom completion go code"
+        __coaltest_debug "Received error from custom completion code"
         return
     }
 
