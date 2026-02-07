@@ -39,10 +39,10 @@ Future<void> expectGolden(String relativePath, String actual) async {
     await file.writeAsString(normalizedActual);
   }
 
-  final expected = await file.readAsString();
+  final normalizedExpected = (await file.readAsString()).replaceAll('\r\n', '\n');
   expect(
     normalizedActual,
-    expected,
+    normalizedExpected,
     reason:
         'golden mismatch: $relativePath\n'
         're-run with COAL_UPDATE_GOLDENS=true to update snapshots',
