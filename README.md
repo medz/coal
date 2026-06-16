@@ -14,6 +14,20 @@ improve existing CLI packages and hand-rolled command-line tools.
 | [`package:coal/tab.dart`](#tab) | Supported | Shell completion definitions and script generation. |
 | [`package:coal/tab/args.dart`](example/README.md#args-adapter) | Supported | Completion adapter for `package:args` `CommandRunner` apps. |
 
+## CLI
+
+Coal includes a small maintenance CLI:
+
+```bash
+dart pub global activate coal
+coal doctor
+coal complete bash
+coal dart-complete bash
+```
+
+`coal dart-complete <shell>` prints a completion script for the Dart CLI.
+Source it the same way as other shell completion scripts.
+
 ## Roadmap
 
 Coal's current plan is to stabilize the supported modules before expanding

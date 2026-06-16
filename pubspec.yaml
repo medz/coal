@@ -6,6 +6,9 @@ repository: https://github.com/medz/coal
 environment:
   sdk: ^3.9.2
 
+executables:
+  coal:
+
 dependencies:
   # Required by lib/tab/args.dart for CommandRunner integration.
   args: ^2.7.0

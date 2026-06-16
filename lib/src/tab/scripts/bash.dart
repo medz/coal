@@ -11,7 +11,7 @@
 import '../flags.dart';
 import '_utils.dart';
 
-String bashScript(String name, String exec) {
+String bashScript(String name, String exec, {String backend = 'complete --'}) {
   final escapedName = nameForVar(name);
   return '''# bash completion for $name
 #----------------------------------------
@@ -43,7 +43,7 @@ __${escapedName}_complete() {
     local requestComp out directive
 
     # Build the command to get completions
-    requestComp="$exec complete -- \${words[@]:1}"
+    requestComp="$exec $backend \${words[@]:1}"
 
     # Add an empty parameter if the last parameter is complete
     if [[ -z "\$cur" ]]; then

@@ -10,5 +10,5 @@ enum Shell {
   zsh(zshScript);
 
   const Shell(this.generate);
-  final String Function(String name, String exec) generate;
+  final String Function(String name, String exec, {String backend}) generate;
 }

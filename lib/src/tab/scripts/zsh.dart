@@ -11,7 +11,7 @@
 import '../flags.dart';
 import '_utils.dart';
 
-String zshScript(String name, String exec) {
+String zshScript(String name, String exec, {String backend = 'complete --'}) {
   final escapedName = nameForVar(name);
   return '''#compdef $name
 compdef _$escapedName $name
@@ -77,7 +77,7 @@ _$escapedName() {
     local quoted_args=("\${(@q)args_to_quote}")
 
     # Join the main command and the quoted arguments into a single string for eval
-    requestComp="$exec complete -- \${quoted_args[*]}"
+    requestComp="$exec $backend \${quoted_args[*]}"
 
     __${escapedName}_debug "About to call: eval \${requestComp}"
 
