@@ -1,5 +1,6 @@
 ## 0.0.7 - 2026-06-17
 
+- feat(keypass): add key input decoding and binding dispatch primitives
 - feat(cli): add a narrow Coal CLI with doctor and Dart completion script commands
 - docs: define the supported module boundary and release readiness gates
 - docs: fix args and `package:args` adapter examples

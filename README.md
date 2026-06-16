@@ -10,6 +10,7 @@ improve existing CLI packages and hand-rolled command-line tools.
 | Entry | Status | Description |
 |:----:|:----:|:----|
 | [`package:coal/args.dart`](#args-parser) | Supported | Lightweight command-line argument parsing. |
+| [`package:coal/keypass.dart`](#keypass) | Supported | Key decoding, parsing, and binding dispatch primitives. |
 | [`package:coal/utils.dart`](#ansi-utility) | Supported | ANSI escape code, text width, wrapping, and styling utilities. |
 | [`package:coal/tab.dart`](#tab) | Supported | Shell completion definitions and script generation. |
 | [`package:coal/tab/args.dart`](example/README.md#args-adapter) | Supported | Completion adapter for `package:args` `CommandRunner` apps. |
@@ -71,6 +72,25 @@ There is a simple TAB demo → [\<TAB\> example](example/README.md#tab)
 The `package:coal/tab/args.dart` adapter can register completion definitions
 from a `package:args` `CommandRunner` app. See the
 [`args` adapter example](example/README.md#args-adapter).
+
+## Keypass
+
+Coal's Keypass module decodes terminal key bytes into text input and key events,
+then dispatches normalized key bindings:
+
+```dart
+import 'package:coal/keypass.dart';
+
+final keypass = Keypass()
+  ..bind('ctrl+c', (event) => print('cancel'))
+  ..bind('up', (event) => print('history up'));
+
+keypass.addString('\u0003'); // ctrl+c
+keypass.addString('\u001b[A'); // up arrow
+```
+
+`KeyParser` and `KeyDispatcher` are available separately when an app wants to
+own terminal mode, buffering, or line editing itself.
 
 ## Args Parser
 
