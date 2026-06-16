@@ -9,7 +9,7 @@ and easy to test without a real terminal unless the feature truly needs one.
 | Layer | Modules | Rule |
 | --- | --- | --- |
 | Core | Args, Utils, Tab | Supported now. Keep API stable and dependency-light. |
-| Terminal input | Keypass, Readline | Keypass is supported; Readline should build on it without global side effects. |
+| Terminal input | Keypass, Readline | Supported as small parsing and editing primitives without global side effects. |
 | Prompt | Prompt, Prompt Utils | Build on Keypass/Readline after their contracts are clear. |
 | Coal CLI | `coal` executable | Only maintenance/setup commands, not a general app framework. |
 
@@ -22,6 +22,7 @@ and easy to test without a real terminal unless the feature truly needs one.
 | Tab | `package:coal/tab.dart` | Supported | Completion definitions and shell script generation for Bash, Zsh, Fish, and PowerShell. |
 | Args adapter | `package:coal/tab/args.dart` | Supported | Completion wiring for `package:args` `CommandRunner` apps. |
 | Keypass | `package:coal/keypass.dart` | Supported | Terminal key decoding, stateful byte parsing, and binding dispatch without owning stdin. |
+| Readline | `package:coal/readline.dart` | Supported | Line buffer, cursor editing, history navigation, and Keypass input application without owning stdin. |
 
 ## Issue Map
 
@@ -30,7 +31,7 @@ and easy to test without a real terminal unless the feature truly needs one.
 | #11 Tab maintenance docs | Implement as a short maintainer guide. |
 | #16 Dart CLI completion setup | Implement through the Coal CLI. Start with script generation before shell-specific install automation. |
 | #12 Keypass | Implemented as small key decoding, stateful parsing, and binding dispatch primitives. No raw-mode or stdin ownership in the core API. |
-| #13 Readline | Do not merge the old `stdin.readLineSync` wrapper as "readline". A real slice needs cursor editing, history, and tests built on Keypass. |
+| #13 Readline | Implemented as a testable line editing core built on Keypass input types. No stdin/raw-mode ownership. |
 | #14 Prompt | Defer until Readline has a stable editing contract. |
 | #15 Prompt Utils | Defer until Prompt exists; utilities must prove repeated real use. |
 | #2 Dependency dashboard | Keep Renovate-managed; no product work unless dependencies are stale or blocking. |

@@ -11,6 +11,7 @@ improve existing CLI packages and hand-rolled command-line tools.
 |:----:|:----:|:----|
 | [`package:coal/args.dart`](#args-parser) | Supported | Lightweight command-line argument parsing. |
 | [`package:coal/keypass.dart`](#keypass) | Supported | Key decoding, parsing, and binding dispatch primitives. |
+| [`package:coal/readline.dart`](#readline) | Supported | Readline-style line buffer, history, and editing state. |
 | [`package:coal/utils.dart`](#ansi-utility) | Supported | ANSI escape code, text width, wrapping, and styling utilities. |
 | [`package:coal/tab.dart`](#tab) | Supported | Shell completion definitions and script generation. |
 | [`package:coal/tab/args.dart`](example/README.md#args-adapter) | Supported | Completion adapter for `package:args` `CommandRunner` apps. |
@@ -91,6 +92,28 @@ keypass.addString('\u001b[A'); // up arrow
 
 `KeyParser` and `KeyDispatcher` are available separately when an app wants to
 own terminal mode, buffering, or line editing itself.
+
+## Readline
+
+Coal's Readline module provides the editable line state used by interactive
+terminal flows:
+
+```dart
+import 'package:coal/keypass.dart';
+import 'package:coal/readline.dart';
+
+final editor = LineEditor();
+final parser = KeyParser();
+
+for (final input in parser.addString('co\u001b[D!')) {
+  editor.apply(input);
+}
+
+print(editor.text); // c!o
+```
+
+It intentionally does not own stdin, raw mode, or prompt rendering. Those
+remain application responsibilities or future higher-level modules.
 
 ## Args Parser
 
