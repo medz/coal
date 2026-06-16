@@ -20,6 +20,14 @@ void main() {
                 'missing expected bash fragment from ${contractCase.key}: $fragment',
           );
         }
+        for (final fragment in expectations.absent) {
+          expect(
+            script,
+            isNot(contains(fragment)),
+            reason:
+                'unexpected bash fragment from ${contractCase.key}: $fragment',
+          );
+        }
       });
     }
   });

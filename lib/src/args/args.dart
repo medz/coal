@@ -85,7 +85,7 @@ Args _parse(
   final wrappedDefaults = defaults != null && defaults.isNotEmpty
       ? wrapDefaults(defaults)
       : <String, Argv>{};
-  if (input.isEmpty) return _ArgsImpl(wrapDefaults(wrappedDefaults));
+  if (input.isEmpty) return _ArgsImpl(wrappedDefaults);
   final rest = <String>[],
       coerceRest = [],
       args = _ArgsImpl(wrappedDefaults, rest, coerceRest),
@@ -95,28 +95,33 @@ Args _parse(
         ValueType.string: [...?string],
         ValueType.list: [...?list],
       };
+  String resolveAlias(String key) => aliases?[key] ?? key;
 
   for (int index = 0; index < length; index++) {
     final curr = input.elementAt(index),
         next = input.elementAtOrNull(index + 1);
     ValueType? type;
     String key = '';
+    String? negatedKey;
     String? value;
 
     if (curr.length > 1 && curr.startsWith('-')) {
       if (!curr.startsWith('--') && curr.length > 2 && !curr.contains('=')) {
         if (curr.contains('.')) {
-          key = curr.substring(1, 2);
+          key = resolveAlias(curr.substring(1, 2));
+          type = typeof(key, types);
           value = curr.substring(2);
         } else {
           final keys = curr.substring(1, curr.length - 1);
           for (String key in keys.characters) {
-            if (aliases?[key] case String fullKey) key = fullKey;
-            dotNestedSet(args, key, defaultValue(type), type);
+            key = resolveAlias(key);
+            final keyType = typeof(key, types);
+            dotNestedSet(args, key, defaultValue(keyType), keyType);
           }
 
-          key = curr.substring(curr.length - 1);
-          if (next != null && !next.startsWith('-')) {
+          key = resolveAlias(curr.substring(curr.length - 1));
+          type = typeof(key, types);
+          if (next != null && !next.startsWith('-') && type != ValueType.bool) {
             value = next;
             index++;
           }
@@ -127,6 +132,10 @@ Args _parse(
           String curr when curr.startsWith('-') => curr.substring(1),
           _ => curr,
         };
+        if (key.length > 3 && key.startsWith('no-')) {
+          negatedKey = key.substring(3);
+        }
+        key = resolveAlias(key);
         type = typeof(key, types);
         if (type == ValueType.bool) {
           value = 'true';
@@ -150,17 +159,22 @@ Args _parse(
           };
           value = curr.substring(eq + 1);
         }
+        if (key.length > 3 && key.startsWith('no-')) {
+          negatedKey = key.substring(3);
+        }
+        key = resolveAlias(key);
         type = typeof(key, types);
       }
 
-      if ((type == null || type == ValueType.bool) &&
-          key.length > 3 &&
-          key.startsWith('no-')) {
-        dotNestedSet(args, key.substring(3), false);
+      if ((type == null || type == ValueType.bool) && negatedKey != null) {
+        dotNestedSet(args, negatedKey, false);
       } else {
-        if (aliases?[key] case final String fullKey) key = fullKey;
-        // dart format off
-        dotNestedSet(args, key, coerce(value, type) ?? defaultValue(type), type); // dart format on
+        dotNestedSet(
+          args,
+          key,
+          coerce(value, type) ?? defaultValue(type),
+          type,
+        );
       }
     } else if (curr.isNotEmpty) {
       rest.add(curr);

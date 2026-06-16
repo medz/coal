@@ -39,7 +39,10 @@ Future<void> expectGolden(String relativePath, String actual) async {
     await file.writeAsString(normalizedActual);
   }
 
-  final normalizedExpected = (await file.readAsString()).replaceAll('\r\n', '\n');
+  final normalizedExpected = (await file.readAsString()).replaceAll(
+    '\r\n',
+    '\n',
+  );
   expect(
     normalizedActual,
     normalizedExpected,

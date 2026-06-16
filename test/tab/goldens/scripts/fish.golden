@@ -25,15 +25,23 @@ function __coaltest_perform_completion
 
     # Extract all args and the current token.
     set -l args (commandline -opc)
-    set -l last_arg (string escape -- (commandline -ct))
+    set -l last_arg (commandline -ct)
 
     __coaltest_debug "Args: $args"
     __coaltest_debug "Last arg: $last_arg"
 
     # Call the completion program and get the results
-    set -l requestComp "/usr/bin/dart /path/to/testcli complete -- $args[2..-1] $last_arg"
+    set -l requestComp '/usr/bin/dart' '/path/to/testcli' complete --
+    for arg in $args[2..-1]
+        set -a requestComp "$arg"
+    end
+    if test -z "$last_arg"
+        set -a requestComp ""
+    else
+        set -a requestComp "$last_arg"
+    end
     __coaltest_debug "Calling $requestComp"
-    set -l results (eval $requestComp 2> /dev/null)
+    set -l results ($requestComp 2> /dev/null)
 
     # Some programs may output extra empty lines after the directive.
     # Let's ignore them or else it will break completion.

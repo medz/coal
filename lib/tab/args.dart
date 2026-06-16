@@ -4,6 +4,8 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 import 'package:coal/tab.dart' as coal;
 
+import '../src/tab/shell_command_name.dart' as shell_names;
+
 /// Adds a `complete` subcommand that prints shell completion scripts.
 class CompleteCommand extends Command {
   CompleteCommand(this.runner);
@@ -38,25 +40,60 @@ class CompleteCommand extends Command {
       return tab.parse(args);
     }
 
-    final (name, exec) = resolveExecInfo();
-    tab.setup(name, exec, shell);
+    final targetShell = resolveShell(shell);
+    final (name, exec) = resolveExecInfo(targetShell);
+    print(targetShell.generate(name, exec));
   }
 }
 
 extension on CompleteCommand {
-  (String, String) resolveExecInfo() {
-    final script = Platform.script.toFilePath();
-    final exec = Platform.resolvedExecutable;
-    // if (script.endsWith('.dart') && exec.endsWith('/dart')) {
-    //   throw UnsupportedError('dart run <file> is not currently supported');
-    // }
+  coal.Shell resolveShell(String? shellName) {
+    shellName = shellName?.trim().toLowerCase();
+    return coal.Shell.values.firstWhere(
+      (shell) => shell.name == shellName,
+      orElse: () => throw UnsupportedError('Unsupported shell'),
+    );
+  }
 
+  (String, String) resolveExecInfo(coal.Shell shell) {
+    final script = Platform.script.toFilePath();
     final name = script.split(Platform.pathSeparator).last;
-    if (script == exec) {
-      return (name, script);
+
+    if (isDartSourceMode(script)) {
+      throw UnsupportedError(
+        'Shell completion setup requires a compiled executable. '
+        'Run `dart compile exe` first, then call the compiled binary.',
+      );
     }
 
-    return (name, 'dart $script');
+    validateCommandName(name);
+
+    return (name, quotePath(script, shell));
+  }
+
+  bool isDartSourceMode(String script) {
+    if (!script.endsWith('.dart')) return false;
+
+    final executableName = Platform.resolvedExecutable
+        .split(Platform.pathSeparator)
+        .last
+        .toLowerCase();
+    return executableName == (Platform.isWindows ? 'dart.exe' : 'dart');
+  }
+
+  void validateCommandName(String name) {
+    shell_names.validateShellCommandName(
+      name,
+      context: 'Shell completion setup requires an executable name',
+      suffix: '. Compile to a shell-safe output name.',
+    );
+  }
+
+  String quotePath(String path, coal.Shell shell) {
+    return switch (shell) {
+      coal.Shell.powershell => "'${path.replaceAll("'", "''")}'",
+      _ => "'${path.replaceAll("'", r"'\''")}'",
+    };
   }
 }
 

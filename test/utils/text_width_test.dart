@@ -1,5 +1,4 @@
 import 'package:coal/utils.dart';
-import 'package:oxy/oxy.dart';
 import 'package:test/test.dart';
 
 num getWidth(
@@ -110,6 +109,11 @@ void main() {
         expect(getWidth('\u001B'), 0);
       });
 
+      test('treats generic OSC sequences as zero-width controls', () {
+        expect(getWidth('\x1b]0;terminal title\x07abc'), 3);
+        expect(getWidth('\x1b]133;A\x1b\\abc'), 3);
+      });
+
       test('supports tab characters', () {
         expect(getWidth('\t'), 8);
         expect(getWidth('\t\t\t'), 24);
@@ -140,12 +144,21 @@ void main() {
         expect(getWidth('🇺🇳' * 2), 4);
       });
 
-      test('supports all basic emojis', () async {
-        final res = await oxy.get(
-          'https://raw.githubusercontent.com/muan/unicode-emoji-json/refs/heads/main/data-by-emoji.json',
-        );
-        final data = await res.json();
-        for (final String emoji in Map.from(data).keys) {
+      test('supports representative emoji sequences', () {
+        const samples = [
+          '😀',
+          '👶🏽',
+          '👩‍👩‍👦‍👦',
+          '👨‍❤️‍💋‍👨',
+          '🏴‍☠️',
+          '🏴',
+          '🇸🇪',
+          '🇺🇳',
+          '1️⃣',
+          '↔️',
+        ];
+
+        for (final emoji in samples) {
           expect(getWidth(emoji), 2);
         }
       });

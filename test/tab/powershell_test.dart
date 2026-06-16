@@ -24,6 +24,14 @@ void main() {
                 'missing expected powershell fragment from ${contractCase.key}: $fragment',
           );
         }
+        for (final fragment in expectations.absent) {
+          expect(
+            script,
+            isNot(contains(fragment)),
+            reason:
+                'unexpected powershell fragment from ${contractCase.key}: $fragment',
+          );
+        }
       });
     }
   });

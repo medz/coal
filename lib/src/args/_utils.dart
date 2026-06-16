@@ -20,24 +20,33 @@ void dotNestedSet<T>(
   ValueType? type,
 ]) {
   if (key.contains('.')) {
-    final parts = key.split('.'), last = parts.last;
-    for (final part in parts) {
-      if (part == last) break;
-      final nested = Argv(<String, Argv>{});
-      dotNestedSet(argv, part, nested);
-      argv = nested;
+    final parts = key.split('.');
+    for (final part in parts.take(parts.length - 1)) {
+      final existingValue = argv.value[part]?.value;
+      if (existingValue is Map) {
+        argv = Argv<Map<String, Argv>>(existingValue.cast<String, Argv>());
+      } else {
+        final nested = Argv(<String, Argv>{});
+        argv.value[part] = nested;
+        argv = nested;
+      }
     }
-    key = last;
+    key = parts.last;
   }
 
   if (type == ValueType.list && argv.value.containsKey(key)) {
+    if (value case final List list when list.isEmpty) return;
     if (argv.value[key]?.value case final List list) {
       list.add(Argv(value));
     } else {
       argv.value[key] = Argv([Argv(value)]);
     }
   } else if (type == ValueType.list) {
-    argv.value[key] = Argv([Argv(value)]);
+    if (value case final List list when list.isEmpty) {
+      argv.value[key] = Argv(<Argv>[]);
+    } else {
+      argv.value[key] = Argv([Argv(value)]);
+    }
   } else {
     argv.value[key] = Argv(value);
   }
@@ -64,9 +73,13 @@ Object? coerce(String? value, [ValueType? type]) {
   if (value == null || value.isEmpty) return value;
   if (value.length > 3 && isBoolean(value)) return value == 'true';
   if (value.length > 2 && isQuoted(value)) return value.unquoted;
-  if ((value[0] == '.' && num.tryParse(value[1]) != null) ||
-      num.tryParse(value[0]) != null) {
-    return switch (num.parse(value)) {
+  final numericValue = num.tryParse(value);
+  if (numericValue != null &&
+      ((value.length > 1 &&
+              value[0] == '.' &&
+              num.tryParse(value[1]) != null) ||
+          num.tryParse(value[0]) != null)) {
+    return switch (numericValue) {
       int value => value,
       double value => value,
     };

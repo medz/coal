@@ -1,3 +1,10 @@
+## 0.0.7 - 2026-06-17
+
+- fix(args): preserve dotted siblings, dotted lists, and empty-input defaults
+- fix(utils): correct erase-line and horizontal scroll ANSI sequences
+- test(utils): remove network dependency from text-width coverage
+- docs: align README and examples with the current public API
+
 ## 0.0.6 - 2026-02-06
 
 - fix(tab): harden completion behavior and add regression tests

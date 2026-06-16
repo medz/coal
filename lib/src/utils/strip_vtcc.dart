@@ -2,12 +2,13 @@
 // Ref: https://github.com/nodejs/node/blob/main/lib/internal/util/inspect.js#L288
 // Matches all ansi escape code sequences in a string
 final _ansi = RegExp(
-  '[\\u001B\\u009B][[\\]()#;?]*'
-  '(?:(?:(?:(?:;[-a-zA-Z\\d\\/\\#&.:=?%@~_]+)*'
-  '|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/\\#&.:=?%@~_]*)*)?'
-  '(?:\\u0007|\\u001B\\u005C|\\u009C))'
-  '|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?'
-  '[\\dA-PR-TZcf-nq-uy=><~]))',
+  r'\u001B[78]'
+  r'|'
+  r'[\u001B\u009B](?:'
+  r'\][^\u0007\u001B]*(?:\u0007|\u001B\u005C|\u009C)'
+  r'|'
+  r'[\[\]()#;?]*[0-?]*(?:[ -/]*[@-~])'
+  r')',
 );
 
 // Ref: https://github.com/nodejs/node/blob/main/lib/internal/util/inspect.js#L3015

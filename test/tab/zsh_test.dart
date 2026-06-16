@@ -20,6 +20,14 @@ void main() {
                 'missing expected zsh fragment from ${contractCase.key}: $fragment',
           );
         }
+        for (final fragment in expectations.absent) {
+          expect(
+            script,
+            isNot(contains(fragment)),
+            reason:
+                'unexpected zsh fragment from ${contractCase.key}: $fragment',
+          );
+        }
       });
     }
   });
