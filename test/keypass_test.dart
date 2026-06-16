@@ -11,6 +11,8 @@ void main() {
       expect(normalizeKeyBinding('spacebar'), 'space');
       expect(normalizeKeyBinding('ArrowUp'), 'up');
       expect(normalizeKeyBinding('cmd + pgdown'), 'meta+pagedown');
+      expect(normalizeKeyBinding('+'), 'plus');
+      expect(normalizeKeyBinding('ctrl++'), 'ctrl+plus');
     });
 
     test('throws for invalid bindings', () {
@@ -45,6 +47,10 @@ void main() {
       expect(KeyDecoder.decodeSequence('\u001b[3~'), KeyEvent('delete'));
       expect(KeyDecoder.decodeSequence('\u001bOP'), KeyEvent('f1'));
       expect(KeyDecoder.decodeSequence('\u001ba'), KeyEvent('a', meta: true));
+      expect(
+        KeyDecoder.decodeSequence('\u001b[200~'),
+        const ControlSequenceInput('\u001b[200~'),
+      );
     });
   });
 
@@ -82,6 +88,28 @@ void main() {
       expect(parser.addString('\u001b'), isEmpty);
       expect(parser.flush(), <KeyInput>[KeyEvent('escape')]);
     });
+
+    test('keeps unsupported control sequences out of text input', () {
+      final parser = KeyParser();
+
+      expect(parser.addString('\u001b[200~abc'), <KeyInput>[
+        const ControlSequenceInput('\u001b[200~'),
+        const TextInput('abc'),
+      ]);
+      expect(parser.addString('\u001b[?25h'), <KeyInput>[
+        const ControlSequenceInput('\u001b[?25h'),
+      ]);
+      expect(parser.addString('\u001b[I'), <KeyInput>[
+        const ControlSequenceInput('\u001b[I'),
+      ]);
+    });
+
+    test('flushes incomplete control sequences as control input', () {
+      final parser = KeyParser();
+
+      expect(parser.addString('\u001b['), isEmpty);
+      expect(parser.flush(), <KeyInput>[const ControlSequenceInput('\u001b[')]);
+    });
   });
 
   group('key dispatcher', () {
@@ -89,12 +117,15 @@ void main() {
       final triggered = <String>[];
       final dispatcher = KeyDispatcher()
         ..bind('ctrl+c', (event) => triggered.add(event.binding))
+        ..bind('ctrl+c', (event) => triggered.add('again:${event.binding}'))
         ..bind('shift+up', (event) => triggered.add(event.binding));
 
+      expect(dispatcher.bindingCount, 2);
+      expect(dispatcher.handlerCount, 3);
       expect(dispatcher.dispatch(KeyEvent('c', ctrl: true)), isTrue);
       expect(dispatcher.dispatch(KeyEvent('up', shift: true)), isTrue);
       expect(dispatcher.dispatch(KeyEvent('down')), isFalse);
-      expect(triggered, <String>['ctrl+c', 'shift+up']);
+      expect(triggered, <String>['ctrl+c', 'again:ctrl+c', 'shift+up']);
     });
 
     test('replaces and removes handlers', () {

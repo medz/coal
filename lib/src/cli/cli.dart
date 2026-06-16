@@ -141,7 +141,9 @@ class DartCompleteCommand extends Command {
       orElse: () =>
           throw UsageException('Unsupported shell: $shellName', usage),
     );
-    _out.writeln(shell.generate('dart', 'coal dart-complete', backend: '--'));
+    _out.writeln(
+      shell.generate('dart', 'coal dart-complete', completionCommand: '--'),
+    );
     return 0;
   }
 }

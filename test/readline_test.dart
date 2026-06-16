@@ -129,5 +129,16 @@ void main() {
       expect(editor.text, 'c!o');
       expect(editor.cursor, 2);
     });
+
+    test('ignores unsupported control sequences', () {
+      final editor = LineEditor();
+      final parser = KeyParser();
+
+      for (final input in parser.addString('a\u001b[200~b')) {
+        editor.apply(input);
+      }
+
+      expect(editor.text, 'ab');
+    });
   });
 }

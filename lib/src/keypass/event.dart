@@ -23,6 +23,24 @@ final class TextInput extends KeyInput {
   String toString() => 'TextInput($text)';
 }
 
+/// Unsupported terminal control sequence that should not be inserted as text.
+final class ControlSequenceInput extends KeyInput {
+  const ControlSequenceInput(this.sequence);
+
+  final String sequence;
+
+  @override
+  bool operator ==(Object other) {
+    return other is ControlSequenceInput && other.sequence == sequence;
+  }
+
+  @override
+  int get hashCode => sequence.hashCode;
+
+  @override
+  String toString() => 'ControlSequenceInput($sequence)';
+}
+
 /// Non-text key input such as arrows, enter, or control chords.
 final class KeyEvent extends KeyInput {
   KeyEvent(
@@ -80,8 +98,12 @@ String normalizeKeyBinding(String binding) {
   var shift = false;
   String? key;
 
-  for (final rawPart in source.split('+')) {
-    final part = rawPart.trim();
+  final rawParts = source.split('+');
+  for (final (index, rawPart) in rawParts.indexed) {
+    var part = rawPart.trim();
+    if (part.isEmpty && index == rawParts.length - 1 && source.endsWith('+')) {
+      part = '+';
+    }
     if (part.isEmpty) continue;
 
     final lower = part.toLowerCase();

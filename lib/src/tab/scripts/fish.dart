@@ -11,7 +11,11 @@
 import '../flags.dart';
 import '_utils.dart';
 
-String fishScript(String name, String exec, {String backend = 'complete --'}) {
+String fishScript(
+  String name,
+  String exec, {
+  String completionCommand = 'complete --',
+}) {
   final escapedName = nameForVar(name);
   return '''# fish completion for $name -*- shell-script -*-
 #----------------------------------------
@@ -46,7 +50,7 @@ function __${escapedName}_perform_completion
     __${escapedName}_debug "Last arg: \$last_arg"
 
     # Call the completion program and get the results
-    set -l requestComp "$exec $backend \$args[2..-1] \$last_arg"
+    set -l requestComp "$exec $completionCommand \$args[2..-1] \$last_arg"
     __${escapedName}_debug "Calling \$requestComp"
     set -l results (eval \$requestComp 2> /dev/null)
 

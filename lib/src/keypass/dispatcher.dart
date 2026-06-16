@@ -3,10 +3,16 @@ import 'event.dart';
 typedef KeyBindingHandler = void Function(KeyEvent event);
 
 /// Dispatches normalized key events to registered handlers.
+///
+/// Printable input is decoded as [TextInput], not [KeyEvent], so it is not
+/// matched by this dispatcher. Consumers that need text should handle
+/// [TextInput] directly or use `package:coal/readline.dart`.
 final class KeyDispatcher {
   final _bindings = <String, List<KeyBindingHandler>>{};
 
-  int get bindingCount {
+  int get bindingCount => _bindings.length;
+
+  int get handlerCount {
     return _bindings.values.fold<int>(
       0,
       (count, handlers) => count + handlers.length,

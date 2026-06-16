@@ -89,7 +89,7 @@ void main() {
       );
       addTearDown(() => tmp.delete(recursive: true));
 
-      final backend = await writeScript(
+      final completion = await writeScript(
         '${tmp.path}/mock_complete.sh',
         '''#!/usr/bin/env bash
 if [[ "\$1" == "complete" && "\$2" == "--" ]]; then
@@ -103,7 +103,7 @@ exit 1
 
       final script = await writeScript(
         '${tmp.path}/coaltest.bash',
-        Shell.bash.generate('coaltest', backend.path),
+        Shell.bash.generate('coaltest', completion.path),
       );
 
       final harness = r'''
@@ -149,6 +149,78 @@ printf '%s\n' "${COMPREPLY[@]}"
           .where((line) => line.isNotEmpty)
           .toList();
       expect(output, contains('--name'));
+    }, skip: !runBash);
+
+    test('bash script executes custom completion command flow', () async {
+      final tmp = await Directory.systemTemp.createTemp(
+        'coal-tab-bash-custom-runtime-',
+      );
+      addTearDown(() => tmp.delete(recursive: true));
+
+      final completion = await writeScript(
+        '${tmp.path}/mock_custom_complete.sh',
+        '''#!/usr/bin/env bash
+if [[ "\$1" == "--" ]]; then
+  printf '%s\n' 'pub\tWork with packages' ':0'
+  exit 0
+fi
+exit 1
+''',
+        executable: true,
+      );
+
+      final script = await writeScript(
+        '${tmp.path}/coaltest.bash',
+        Shell.bash.generate(
+          'coaltest',
+          completion.path,
+          completionCommand: '--',
+        ),
+      );
+
+      final harness = r'''
+set -euo pipefail
+
+_get_comp_words_by_ref() {
+  local OPTIND opt
+  while getopts "n:" opt; do :; done
+  shift $((OPTIND - 1))
+
+  local curvar="$1" prevvar="$2" wordsvar="$3" cwordvar="$4"
+  printf -v "$curvar" '%s' "${COMP_WORDS[COMP_CWORD]}"
+  if (( COMP_CWORD > 0 )); then
+    printf -v "$prevvar" '%s' "${COMP_WORDS[COMP_CWORD-1]}"
+  else
+    printf -v "$prevvar" ''
+  fi
+  eval "$wordsvar=(\"${COMP_WORDS[@]}\")"
+  printf -v "$cwordvar" '%s' "$COMP_CWORD"
+}
+
+source "$COMPLETION_FILE"
+COMP_WORDS=(coaltest pu)
+COMP_CWORD=1
+__coaltest_complete
+printf '%s\n' "${COMPREPLY[@]}"
+''';
+
+      final result = await Process.run(
+        'bash',
+        ['-lc', harness],
+        environment: {'COMPLETION_FILE': script.path},
+      );
+
+      expect(
+        result.exitCode,
+        0,
+        reason: 'bash custom runtime failed: ${result.stderr}',
+      );
+      final output = (result.stdout as String)
+          .split('\n')
+          .map((line) => line.trim())
+          .where((line) => line.isNotEmpty)
+          .toList();
+      expect(output, contains('pub'));
     }, skip: !runBash);
 
     test('zsh script passes syntax check', () async {

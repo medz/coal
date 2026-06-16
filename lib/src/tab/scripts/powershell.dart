@@ -14,7 +14,7 @@ import '_utils.dart';
 String powershellScript(
   String name,
   String exec, {
-  String backend = 'complete --',
+  String completionCommand = 'complete --',
 }) {
   final escapedName = nameForVar(name);
   return '''# powershell completion for $name -*- shell-script -*-
@@ -71,7 +71,7 @@ String powershellScript(
     # Split the command at the first space to separate the program and arguments.
     \$Program, \$Arguments = \$Command.Split(" ", 2)
 
-    \$RequestComp = "& $exec $backend \$Arguments"
+    \$RequestComp = "& $exec $completionCommand \$Arguments"
     __${escapedName}_debug "RequestComp: \$RequestComp"
 
     # we cannot use \$WordToComplete because it

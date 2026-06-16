@@ -90,6 +90,10 @@ keypass.addString('\u0003'); // ctrl+c
 keypass.addString('\u001b[A'); // up arrow
 ```
 
+Printable input is emitted as `TextInput`. Unsupported terminal control
+sequences are emitted as `ControlSequenceInput`, so they can be ignored without
+leaking escape fragments into editable text.
+
 `KeyParser` and `KeyDispatcher` are available separately when an app wants to
 own terminal mode, buffering, or line editing itself.
 

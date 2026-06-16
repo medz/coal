@@ -36,6 +36,17 @@ abstract final class KeyDecoder {
     final ss3 = _decodeSs3(sequence);
     if (ss3 != null) return ss3;
 
+    if (sequence.startsWith(_csiPrefix)) {
+      final end = _findCsiEnd(sequence);
+      if (end == sequence.length - 1) return ControlSequenceInput(sequence);
+      return null;
+    }
+
+    if (sequence.startsWith(_ss3Prefix)) {
+      if (sequence.length == 3) return ControlSequenceInput(sequence);
+      return null;
+    }
+
     final nested = tryDecodeSequence(sequence.substring(1));
     if (nested is KeyEvent) {
       return nested.copyWith(meta: true, sequence: sequence);
@@ -138,8 +149,9 @@ final class KeyParser {
       final end = _findCsiEnd(_pending);
       if (end == null) {
         if (!flush) return null;
-        _pending = _pending.substring(1);
-        return KeyEvent('escape', sequence: _escapeChar);
+        final sequence = _pending;
+        _pending = '';
+        return ControlSequenceInput(sequence);
       }
 
       final sequence = _pending.substring(0, end + 1);
@@ -149,15 +161,16 @@ final class KeyParser {
         return decoded;
       }
 
-      _pending = _pending.substring(1);
-      return KeyEvent('escape', sequence: _escapeChar);
+      _pending = _pending.substring(end + 1);
+      return ControlSequenceInput(sequence);
     }
 
     if (second == _ss3Start) {
       if (_pending.length < 3) {
         if (!flush) return null;
-        _pending = _pending.substring(1);
-        return KeyEvent('escape', sequence: _escapeChar);
+        final sequence = _pending;
+        _pending = '';
+        return ControlSequenceInput(sequence);
       }
 
       final sequence = _pending.substring(0, 3);
@@ -167,8 +180,8 @@ final class KeyParser {
         return decoded;
       }
 
-      _pending = _pending.substring(1);
-      return KeyEvent('escape', sequence: _escapeChar);
+      _pending = _pending.substring(3);
+      return ControlSequenceInput(sequence);
     }
 
     final next = _pending.substring(1).characters.first;

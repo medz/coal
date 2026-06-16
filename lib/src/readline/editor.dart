@@ -50,6 +50,7 @@ final class LineEditor {
   LineEditResult apply(KeyInput input) {
     return switch (input) {
       TextInput(:final text) => _insert(text),
+      ControlSequenceInput() => const LineEditResult.none(),
       KeyEvent() => _applyKey(input),
     };
   }

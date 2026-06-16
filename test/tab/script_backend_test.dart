@@ -2,20 +2,36 @@ import 'package:coal/tab.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('shell completion backend', () {
-    test('uses the default complete backend', () {
+  group('shell completion command', () {
+    test('uses the default complete command', () {
       expect(
         Shell.bash.generate('coal', 'coal'),
         contains('requestComp="coal complete --'),
       );
     });
 
-    test('supports a custom backend command', () {
+    test('supports a custom completion command', () {
       final scripts = <String>[
-        Shell.bash.generate('dart', 'coal dart-complete', backend: '--'),
-        Shell.zsh.generate('dart', 'coal dart-complete', backend: '--'),
-        Shell.fish.generate('dart', 'coal dart-complete', backend: '--'),
-        Shell.powershell.generate('dart', 'coal dart-complete', backend: '--'),
+        Shell.bash.generate(
+          'dart',
+          'coal dart-complete',
+          completionCommand: '--',
+        ),
+        Shell.zsh.generate(
+          'dart',
+          'coal dart-complete',
+          completionCommand: '--',
+        ),
+        Shell.fish.generate(
+          'dart',
+          'coal dart-complete',
+          completionCommand: '--',
+        ),
+        Shell.powershell.generate(
+          'dart',
+          'coal dart-complete',
+          completionCommand: '--',
+        ),
       ];
 
       for (final script in scripts) {

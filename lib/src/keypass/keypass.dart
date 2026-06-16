@@ -13,6 +13,8 @@ final class Keypass {
 
   int get bindingCount => dispatcher.bindingCount;
 
+  int get handlerCount => dispatcher.handlerCount;
+
   void bind(String binding, KeyBindingHandler handler, {bool replace = false}) {
     dispatcher.bind(binding, handler, replace: replace);
   }
