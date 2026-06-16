@@ -102,6 +102,17 @@ final List<ParseContractCase> parseContractCases = <ParseContractCase>[
     ),
   ),
   ParseContractCase(
+    key: 'boolean-option-empty-token',
+    description: 'completes root commands after bool option and trailing space',
+    input: <String>['--verbose', ''],
+    expectations: ParseContractExpectations(
+      exactCompletions: <String>[
+        'project\tProject operations',
+        'deploy\tDeploy service',
+      ],
+    ),
+  ),
+  ParseContractCase(
     key: 'root-subcommand-completion',
     description: 'completes root command names',
     input: <String>['pro'],

@@ -1,3 +1,15 @@
+## 0.0.7 - 2026-06-17
+
+- docs: define the supported module boundary and release readiness gates
+- docs: fix args and `package:args` adapter examples
+- fix(args): preserve dotted sibling values and stable default typed access
+- fix(tab): sanitize shell helper names for command names with special characters
+- fix(tab): repair the source and compiled TAB example setup path
+- fix(utils): correct horizontal scroll escape sequences
+- ci: add example smoke, benchmark smoke, and publish dry-run gates
+- test: declare runtime tags and remove network-backed emoji test dependency
+- chore(deps): remove unused `oxy` dev dependency
+
 ## 0.0.6 - 2026-02-06
 
 - fix(tab): harden completion behavior and add regression tests

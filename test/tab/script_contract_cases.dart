@@ -119,6 +119,14 @@ final List<ScriptContractCase> scriptContractCases = <ScriptContractCase>[
           'complete -c $specialName -f -a "(eval __${escapedName}_perform_completion)"',
         ],
       ),
+      ContractShell.powershell: ShellScriptExpectations(
+        contains: <String>[
+          'function __${escapedName}_debug',
+          'filter __${escapedName}_escapeStringWithSpecialChars',
+          '[scriptblock]\$__${escapedName}CompleterBlock',
+          "Register-ArgumentCompleter -CommandName '$specialName'",
+        ],
+      ),
     },
   ),
 ];

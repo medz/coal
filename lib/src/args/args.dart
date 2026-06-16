@@ -85,7 +85,7 @@ Args _parse(
   final wrappedDefaults = defaults != null && defaults.isNotEmpty
       ? wrapDefaults(defaults)
       : <String, Argv>{};
-  if (input.isEmpty) return _ArgsImpl(wrapDefaults(wrappedDefaults));
+  if (input.isEmpty) return _ArgsImpl(wrappedDefaults);
   final rest = <String>[],
       coerceRest = [],
       args = _ArgsImpl(wrappedDefaults, rest, coerceRest),

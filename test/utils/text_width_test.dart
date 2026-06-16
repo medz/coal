@@ -1,6 +1,68 @@
 import 'package:coal/utils.dart';
-import 'package:oxy/oxy.dart';
 import 'package:test/test.dart';
+
+const basicEmojiSamples = [
+  '😀',
+  '😃',
+  '😄',
+  '😁',
+  '😆',
+  '🥹',
+  '😅',
+  '😂',
+  '🤣',
+  '🥲',
+  '☺️',
+  '😊',
+  '😇',
+  '🙂',
+  '🙃',
+  '😉',
+  '😌',
+  '😍',
+  '🥰',
+  '😘',
+  '😗',
+  '😙',
+  '😚',
+  '😋',
+  '😛',
+  '😝',
+  '😜',
+  '🤪',
+  '🤨',
+  '🧐',
+  '🤓',
+  '😎',
+  '🥳',
+  '🤯',
+  '😤',
+  '😭',
+  '😱',
+  '🤔',
+  '🤗',
+  '🫡',
+  '👍',
+  '👎',
+  '👏',
+  '🙏',
+  '💪',
+  '🧠',
+  '👀',
+  '🫶',
+  '❤️',
+  '🔥',
+  '✨',
+  '🎉',
+  '✅',
+  '🚀',
+  '🐛',
+  '🍎',
+  '⚽',
+  '🏆',
+  '💻',
+  '📦',
+];
 
 num getWidth(
   String input, {
@@ -140,12 +202,8 @@ void main() {
         expect(getWidth('🇺🇳' * 2), 4);
       });
 
-      test('supports all basic emojis', () async {
-        final res = await oxy.get(
-          'https://raw.githubusercontent.com/muan/unicode-emoji-json/refs/heads/main/data-by-emoji.json',
-        );
-        final data = await res.json();
-        for (final String emoji in Map.from(data).keys) {
+      test('supports representative basic emojis', () {
+        for (final emoji in basicEmojiSamples) {
           expect(getWidth(emoji), 2);
         }
       });

@@ -16,6 +16,12 @@ jobs:
   dart:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk:
+          - 3.9.2
+          - stable
 
     steps:
       - name: Checkout
@@ -23,6 +29,8 @@ jobs:
 
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
 
       - name: Install Dependencies
         run: dart pub get
@@ -35,3 +43,16 @@ jobs:
 
       - name: Run Tests
         run: dart test --exclude-tags=script-runtime
+
+      - name: Run Example Smoke Tests
+        run: |
+          dart run example/tab.dart complete bash | bash -n
+          dart compile exe example/tab.dart --output=/tmp/coal-tab-example
+          /tmp/coal-tab-example complete bash | bash -n
+          dart run example/args_example.dart complete bash | bash -n
+
+      - name: Run Benchmark Smoke Test
+        run: dart run bench/args.dart
+
+      - name: Package Publish Dry Run
+        run: dart pub publish --dry-run

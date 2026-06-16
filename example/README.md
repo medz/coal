@@ -39,16 +39,16 @@ tab <TAB>
 dart compile exe args_example.dart --output=args_example
 
 # bash
-source <(tab args_example bash)
+source <(args_example complete bash)
 
 # zsh
-source <(tab args_example zsh)
+source <(args_example complete zsh)
 
 # fish, Remember to delete it after you finish your experience!
-tab args_example fish > ~/.config/fish/completions/args_example.fish
+args_example complete fish > ~/.config/fish/completions/args_example.fish
 
 # powershell
-tab args_example powershell > ~/.args_example-completion.ps1
+args_example complete powershell > ~/.args_example-completion.ps1
 echo '. ~/.args_example-completion.ps1' > $PROFILE
 ```
 

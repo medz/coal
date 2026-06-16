@@ -13,9 +13,9 @@ String scrollDown([int count = 1]) => '${csi}T' * count;
 @pragma('vm:prefer-inline')
 @pragma('wasm:prefer-inline')
 @pragma('dart2js:prefer-inline')
-String scrollLeft([int count = 1]) => '${csi}Z' * count;
+String scrollLeft([int count = 1]) => '$csi @' * count;
 
 @pragma('vm:prefer-inline')
 @pragma('wasm:prefer-inline')
 @pragma('dart2js:prefer-inline')
-String scrollRight([int count = 1]) => '${csi}A' * count;
+String scrollRight([int count = 1]) => '$csi A' * count;

@@ -1,6 +1,6 @@
 name: coal
-description: A suite for easily building beautiful command-line apps.
-version: 0.0.6
+description: A focused utility suite for building polished Dart command-line apps.
+version: 0.0.7
 repository: https://github.com/medz/coal
 
 environment:
@@ -16,5 +16,4 @@ dependencies:
 dev_dependencies:
   benchmark_harness: ^2.3.1
   lints: ^6.0.0
-  oxy: ^0.1.0
   test: ^1.25.6

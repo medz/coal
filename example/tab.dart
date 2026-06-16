@@ -26,13 +26,22 @@ void main(List<String> input) {
       final args = input.skip(2);
       return tab.parse(args);
     } else {
-      return tab.setup(
-        'dart tab.dart',
-        'dart ${Platform.script.toFilePath()}',
-        shell,
-      );
+      final (name, exec) = resolveExecInfo();
+      return tab.setup(name, exec, shell);
     }
   }
 
   print(input);
+}
+
+(String, String) resolveExecInfo() {
+  final script = Platform.script.toFilePath();
+  final exec = Platform.resolvedExecutable;
+  final scriptName = script.split(Platform.pathSeparator).last;
+  final name = scriptName.endsWith('.dart')
+      ? scriptName.substring(0, scriptName.length - '.dart'.length)
+      : scriptName;
+
+  if (script == exec) return (name, script);
+  return (name, 'dart $script');
 }

@@ -20,14 +20,11 @@ void dotNestedSet<T>(
   ValueType? type,
 ]) {
   if (key.contains('.')) {
-    final parts = key.split('.'), last = parts.last;
-    for (final part in parts) {
-      if (part == last) break;
-      final nested = Argv(<String, Argv>{});
-      dotNestedSet(argv, part, nested);
-      argv = nested;
+    final parts = key.split('.');
+    for (final part in parts.take(parts.length - 1)) {
+      argv = nestedArgv(argv, part);
     }
-    key = last;
+    key = parts.last;
   }
 
   if (type == ValueType.list && argv.value.containsKey(key)) {
@@ -41,6 +38,17 @@ void dotNestedSet<T>(
   } else {
     argv.value[key] = Argv(value);
   }
+}
+
+Argv<Map<String, Argv>> nestedArgv(Argv<Map<String, Argv>> argv, String key) {
+  final current = argv.value[key];
+  if (current?.value case final Map<String, Argv> value) {
+    return Argv(value);
+  }
+
+  final nested = Argv(<String, Argv>{});
+  argv.value[key] = nested;
+  return nested;
 }
 
 ValueType? typeof(String key, Map<ValueType, Iterable<String>> types) {

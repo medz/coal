@@ -21,13 +21,13 @@ String powershellScript(String name, String exec) {
 #-----------------------------------------------------
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-    function __${name}_debug {
+    function __${escapedName}_debug {
         if (\$env:BASH_COMP_DEBUG_FILE) {
             "\$args" | Out-File -Append -FilePath "\$env:BASH_COMP_DEBUG_FILE"
         }
     }
 
-    filter __${name}_escapeStringWithSpecialChars {
+    filter __${escapedName}_escapeStringWithSpecialChars {
         \$_ -replace '\\s|#|@|\\\$|;|,|''|\\{|\\}|\\(|\\)|"|\\||<|>|&','\\`\$&'
     }
 
@@ -42,9 +42,9 @@ String powershellScript(String name, String exec) {
     \$Command = \$CommandAst.CommandElements
     \$Command = "\$Command"
 
-    __${name}_debug ""
-    __${name}_debug "========= starting completion logic =========="
-    __${name}_debug "WordToComplete: \$WordToComplete Command: \$Command CursorPosition: \$CursorPosition"
+    __${escapedName}_debug ""
+    __${escapedName}_debug "========= starting completion logic =========="
+    __${escapedName}_debug "WordToComplete: \$WordToComplete Command: \$Command CursorPosition: \$CursorPosition"
 
     # The user could have moved the cursor backwards on the command-line.
     # We need to trigger completion from the \$CursorPosition location, so we need
@@ -54,7 +54,7 @@ String powershellScript(String name, String exec) {
     if (\$Command.Length -gt \$CursorPosition) {
         \$Command = \$Command.Substring(0, \$CursorPosition)
     }
-    __${name}_debug "Truncated command: \$Command"
+    __${escapedName}_debug "Truncated command: \$Command"
 
     \$ShellCompDirectiveError=${ShellCompDirective.error}
     \$ShellCompDirectiveNoSpace=${ShellCompDirective.noSpace}
@@ -68,7 +68,7 @@ String powershellScript(String name, String exec) {
     \$Program, \$Arguments = \$Command.Split(" ", 2)
 
     \$RequestComp = "& $exec complete -- \$Arguments"
-    __${name}_debug "RequestComp: \$RequestComp"
+    __${escapedName}_debug "RequestComp: \$RequestComp"
 
     # we cannot use \$WordToComplete because it
     # has the wrong values if the cursor was moved
@@ -76,13 +76,13 @@ String powershellScript(String name, String exec) {
     if (\$WordToComplete -ne "" ) {
         \$WordToComplete = \$Arguments.Split(" ")[-1]
     }
-    __${name}_debug "New WordToComplete: \$WordToComplete"
+    __${escapedName}_debug "New WordToComplete: \$WordToComplete"
 
 
     # Check for flag with equal sign
     \$IsEqualFlag = (\$WordToComplete -Like "--*=*" )
     if ( \$IsEqualFlag ) {
-        __${name}_debug "Completing equal sign flag"
+        __${escapedName}_debug "Completing equal sign flag"
         # Remove the flag part
         \$Flag, \$WordToComplete = \$WordToComplete.Split("=", 2)
     }
@@ -90,7 +90,7 @@ String powershellScript(String name, String exec) {
     if ( \$WordToComplete -eq "" -And ( -Not \$IsEqualFlag )) {
         # If the last parameter is complete (there is a space following it)
         # We add an extra empty parameter so we can indicate this to the go method.
-        __${name}_debug "Adding extra empty parameter"
+        __${escapedName}_debug "Adding extra empty parameter"
         # PowerShell 7.2+ changed the way how the arguments are passed to executables,
         # so for pre-7.2 or when Legacy argument passing is enabled we need to use
         if (\$PSVersionTable.PsVersion -lt [version]'7.2.0' -or
@@ -103,7 +103,7 @@ String powershellScript(String name, String exec) {
         }
     }
 
-    __${name}_debug "Calling \$RequestComp"
+    __${escapedName}_debug "Calling \$RequestComp"
     # First disable ActiveHelp which is not supported for Powershell
     \$env:ActiveHelp = 0
 
@@ -117,15 +117,15 @@ String powershellScript(String name, String exec) {
         # There is no directive specified
         \$Directive = 0
     }
-    __${name}_debug "The completion directive is: \$Directive"
+    __${escapedName}_debug "The completion directive is: \$Directive"
 
     # remove directive (last element) from out
     \$Out = \$Out | Where-Object { \$_ -ne \$Out[-1] }
-    __${name}_debug "The completions are: \$Out"
+    __${escapedName}_debug "The completions are: \$Out"
 
     if ((\$Directive -band \$ShellCompDirectiveError) -ne 0 ) {
         # Error code.  No completion.
-        __${name}_debug "Received error from custom completion code"
+        __${escapedName}_debug "Received error from custom completion code"
         return
     }
 
@@ -133,7 +133,7 @@ String powershellScript(String name, String exec) {
     [Array]\$Values = \$Out | ForEach-Object {
         # Split the output in name and description
         \$Name, \$Description = \$_.Split("`t", 2)
-        __${name}_debug "Name: \$Name Description: \$Description"
+        __${escapedName}_debug "Name: \$Name Description: \$Description"
 
         # Look for the longest completion so that we can format things nicely
         if (\$Longest -lt \$Name.Length) {
@@ -152,7 +152,7 @@ String powershellScript(String name, String exec) {
     \$Space = " "
     if ((\$Directive -band \$ShellCompDirectiveNoSpace) -ne 0 ) {
         # remove the space here
-        __${name}_debug "ShellCompDirectiveNoSpace is called"
+        __${escapedName}_debug "ShellCompDirectiveNoSpace is called"
         \$Space = ""
     }
 
@@ -160,7 +160,7 @@ String powershellScript(String name, String exec) {
         ((\$Directive -band \$ShellCompDirectiveFilterFileExt) -ne 0 ) -or
         ((\$Directive -band \$ShellCompDirectiveFilterDirs) -ne 0 )
     ) {
-        __${name}_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
+        __${escapedName}_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
 
         # return here to prevent the completion of the extensions
         return
@@ -172,7 +172,7 @@ String powershellScript(String name, String exec) {
 
         # Join the flag back if we have an equal sign flag
         if ( \$IsEqualFlag ) {
-            __${name}_debug "Join the equal sign flag back to the completion value"
+            __${escapedName}_debug "Join the equal sign flag back to the completion value"
             \$_.Name = \$Flag + "=" + \$_.Name
         }
     }
@@ -183,7 +183,7 @@ String powershellScript(String name, String exec) {
     }
 
     if ((\$Directive -band \$ShellCompDirectiveNoFileComp) -ne 0 ) {
-        __${name}_debug "ShellCompDirectiveNoFileComp is called"
+        __${escapedName}_debug "ShellCompDirectiveNoFileComp is called"
 
         if (\$Values.Length -eq 0) {
             # Just print an empty string here so the
@@ -197,7 +197,7 @@ String powershellScript(String name, String exec) {
 
     # Get the current mode
     \$Mode = (Get-PSReadLineKeyHandler | Where-Object { \$_.Key -eq "Tab" }).Function
-    __${name}_debug "Mode: \$Mode"
+    __${escapedName}_debug "Mode: \$Mode"
 
     \$Values | ForEach-Object {
 
@@ -222,10 +222,10 @@ String powershellScript(String name, String exec) {
             "Complete" {
 
                 if (\$Values.Length -eq 1) {
-                    __${name}_debug "Only one completion left"
+                    __${escapedName}_debug "Only one completion left"
 
                     # insert space after value
-                    \$CompletionText = \$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space
+                    \$CompletionText = \$(\$comp.Name | __${escapedName}_escapeStringWithSpecialChars) + \$Space
                     if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
                         [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
                     } else {
@@ -259,7 +259,7 @@ String powershellScript(String name, String exec) {
                 # insert space after value
                 # MenuComplete will automatically show the ToolTip of
                 # the highlighted value at the bottom of the suggestions.
-                \$CompletionText = \$(\$comp.Name | __${name}_escapeStringWithSpecialChars) + \$Space
+                \$CompletionText = \$(\$comp.Name | __${escapedName}_escapeStringWithSpecialChars) + \$Space
                 if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
                     [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
                 } else {
@@ -272,7 +272,7 @@ String powershellScript(String name, String exec) {
                 # Like MenuComplete but we don't want to add a space here because
                 # the user need to press space anyway to get the completion.
                 # Description will not be shown because that's not possible with TabCompleteNext
-                \$CompletionText = \$(\$comp.Name | __${name}_escapeStringWithSpecialChars)
+                \$CompletionText = \$(\$comp.Name | __${escapedName}_escapeStringWithSpecialChars)
                 if (\$ExecutionContext.SessionState.LanguageMode -eq "FullLanguage"){
                     [System.Management.Automation.CompletionResult]::new(\$CompletionText, "\$(\$comp.Name)", 'ParameterValue', "\$(\$comp.Description)")
                 } else {

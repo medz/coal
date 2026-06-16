@@ -160,6 +160,15 @@ void main() {
       final args = Args.parse(input);
       expect(args.toJson(), output);
     });
+
+    test("preserves sibling values", () {
+      const input = ["--db.host", "localhost", "--db.port", "5432"];
+      const output = {
+        "db": {"host": "localhost", "port": 5432},
+      };
+      final args = Args.parse(input);
+      expect(args.toJson(), output);
+    });
   });
 
   group("negated", () {
@@ -250,6 +259,15 @@ void main() {
       final args = Args.parse(input, aliases: {'a': "add"}, bool: ['add']);
 
       expect(args.toJson(), output);
+    });
+  });
+
+  group("defaults", () {
+    test("keeps typed access stable when input is empty", () {
+      final args = Args.parse(const [], defaults: const {"port": 3000});
+
+      expect(args.toJson(), {"port": 3000});
+      expect(args["port"]?.as<int>(), 3000);
     });
   });
 }

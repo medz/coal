@@ -36,25 +36,6 @@ class Tab extends Command {
     if (shouldCompleteFlags(lastPreArg, toComplete)) {
       handleFlagCompletion(matchedCommand, toComplete, lastPreArg);
     } else {
-      if (lastPreArg?.startsWith('-') == true &&
-          toComplete.isEmpty &&
-          endsWithSpace) {
-        Option? option = lastPreArg != null
-            ? findOption(this, lastPreArg)
-            : null;
-        if (option != null && lastPreArg != null) {
-          for (final command in commands.values) {
-            option = findOption(command, lastPreArg);
-            if (option != null) break;
-          }
-        }
-
-        if (option != null && option.isBool == true) {
-          complete(toComplete);
-          return;
-        }
-      }
-
       if (shouldCompleteCommands(toComplete)) {
         handleCommandCompletion(previousArgs, toComplete);
       }
@@ -93,23 +74,23 @@ extension on Tab {
     return null;
   }
 
+  Option? findAnyOption(String name) {
+    if (findOption(this, name) case final Option option) return option;
+
+    for (final command in commands.values) {
+      if (findOption(command, name) case final Option option) return option;
+    }
+
+    return null;
+  }
+
   List<String> stripOptions(Iterable<String> args) {
     final result = <String>[], length = args.length;
     for (int index = 0; index < length;) {
       final arg = args.elementAt(index);
       if (arg.startsWith('-')) {
         index++;
-        bool isBool = false;
-        if (findOption(this, arg) case final Option option) {
-          isBool = option.isBool ?? false;
-        } else {
-          for (final MapEntry(value: command) in commands.entries) {
-            if (findOption(command, arg) case final Option option) {
-              isBool = option.isBool ?? false;
-              break;
-            }
-          }
-        }
+        final isBool = findAnyOption(arg)?.isBool ?? false;
 
         if (!isBool &&
             index < length &&
@@ -148,13 +129,7 @@ extension on Tab {
   bool shouldCompleteFlags(String? lastPrevArg, String toComplete) {
     if (toComplete.startsWith('-')) return true;
     if (lastPrevArg != null && lastPrevArg.startsWith('-') == true) {
-      Option? option = findOption(this, lastPrevArg);
-      if (option == null) {
-        for (final command in commands.values) {
-          option = findOption(command, lastPrevArg);
-          if (option != null) break;
-        }
-      }
+      final option = findAnyOption(lastPrevArg);
 
       if (option != null && option.isBool == true) {
         return false;
@@ -183,16 +158,9 @@ extension on Tab {
     if (optionName != null && optionName.isNotEmpty) {
       final option = findOption(command, optionName);
       if (option?.handler != null) {
-        final suggestions = <Completion>[];
-        option?.handler?.call(
-          (value, description) => suggestions.add(
-            Completion(value: value, description: description),
-          ),
-          command.options,
-        );
         completions
           ..clear()
-          ..addAll(suggestions);
+          ..addAll(collectCompletions(option!.handler!, command.options));
       }
       return;
     }
@@ -271,14 +239,23 @@ extension on Tab {
     }
 
     if (targetArgument != null && targetArgument.handler != null) {
-      final suggestions = <Completion>[];
-      targetArgument.handler?.call(
-        (value, description) =>
-            suggestions.add(Completion(value: value, description: description)),
-        command.options,
+      completions.addAll(
+        collectCompletions(targetArgument.handler!, command.options),
       );
-      completions.addAll(suggestions);
     }
+  }
+
+  List<Completion> collectCompletions(
+    CompleteHandler handler,
+    Map<String, Option> options,
+  ) {
+    final suggestions = <Completion>[];
+    handler(
+      (value, description) =>
+          suggestions.add(Completion(value: value, description: description)),
+      options,
+    );
+    return suggestions;
   }
 
   void complete(String toComplete) {

@@ -1,38 +1,28 @@
 # Coal
 
-A suite for easily building beautiful command-line apps.
+A focused utility suite for building polished Dart command-line apps.
 
-> [!WARNING]
-> **Coal is still in development and may not be fully functional.**
->
-> Coal is not a CLI framework! It's intended to provide convenient and easy-to-use utilities for existing CLI frameworks and developers.
->
-> **Coal also doesn't plan to add command functionality. Its purpose is to enhance existing CLI packages.**
+Coal is not a CLI framework. It provides small, composable utilities that
+improve existing CLI packages and hand-rolled command-line tools.
 
 ## Modules
 
 | Entry | Status | Description |
 |:----:|:----:|:----|
-| [`package:coal/args.dart`](#args-parser) | ✅ | Provides command-line argument parsing functionality. |
-| [`package:coal/utils.dart`](#ansi-utility) | ✅ | Provides utility functions for ANSI escape codes and text manipulation. |
-| [`package:coal/tab.dart`](#tab) | 🚧 | Provides shell command completion and command-line app adapters. |
+| [`package:coal/args.dart`](#args-parser) | Supported | Lightweight command-line argument parsing. |
+| [`package:coal/utils.dart`](#ansi-utility) | Supported | ANSI escape code, text width, wrapping, and styling utilities. |
+| [`package:coal/tab.dart`](#tab) | Supported | Shell completion definitions and script generation. |
+| [`package:coal/tab/args.dart`](example/README.md#args-adapter) | Supported | Completion adapter for `package:args` `CommandRunner` apps. |
 
 ## Roadmap
 
-- [x] [Args: Command-line argument parsing](#args-parser)
-- [x] [Utils: ANSI utility functions](#ansi-utility)
-- [ ] Keypass: Key input binding
-- [ ] Readline: Input handling
-- [ ] Prompt: Basic prompt process support and CLI frame handling
-- [ ] Prompt Utils: Advanced commonly used prompt utilities
-- [x] [Tab: Shell command autocompletion](#core)
-- [x] [Tab Adapters: Tab completion adapters for popular Dart CLI packages](example/README.md#args-adapter)
-- [ ] Dart CLI setup: Add completion to `dart` command
-
+Coal's current plan is to stabilize the supported modules before expanding
+into new terminal interaction areas. See [doc/roadmap.md](doc/roadmap.md)
+for the release goal, deferred product areas, and readiness gates.
 
 ## Installation
 
-To install the Coal suite, run the following command:
+Install the package with Dart:
 
 ```bash
 dart pub add coal
@@ -47,6 +37,8 @@ dart pub add coal
 Coal's core \<TAB\> completion implementation allows you to add completion functionality to any Dart command-line app:
 
 ```dart
+import 'package:coal/tab.dart';
+
 final tab = Tab();
 final complete = tab.command('complete', '<TAB> autocompletion');
 
@@ -62,17 +54,27 @@ There is a simple TAB demo → [\<TAB\> example](example/README.md#tab)
 
 > Thanks to [Cobra](https://github.com/spf13/cobra)! for the script and some of the <TAB> implementation references!
 
-<TAB> completion functionality
+The `package:coal/tab/args.dart` adapter can register completion definitions
+from a `package:args` `CommandRunner` app. See the
+[`args` adapter example](example/README.md#args-adapter).
 
 ## Args Parser
 
-Coal provides a powerful argument parser that allows you to define and parse command-line arguments easily:
+Coal provides a lightweight parser for scripts and custom CLI plumbing:
 
 ```dart
 import 'package:coal/args.dart';
 
-const input = ['--a=1','-b','--bool','--no-boop','--multi=foo','--multi=baz','-xyz'];
-final args = Args.parse(input);
+const input = [
+  '--a=1',
+  '-b',
+  '--bool',
+  '--no-boop',
+  '--multi=foo',
+  '--multi=baz',
+  '-xyz',
+];
+final args = Args.parse(input, list: ['multi']);
 
 print(args.toJson());
 ```
@@ -88,9 +90,6 @@ print(args.toJson());
   "z": true
 }
 ```
-
-> [!WARNING]
-> Coal is currently under development and documentation is not yet ready.
 
 ## ANSI Utility
 
@@ -124,7 +123,7 @@ Coal provides a series of convenient utilities for generating ANSI escape codes:
 | `cursorHide` | Hide the cursor. |
 | `cursorSave` | Save the cursor position. |
 | `cursorRestore` | Restore the cursor position. |
-| `cursorLeft` | Move the cursor left by one column. |
+| `cursorLeft` | Move the cursor to the first column. |
 
 ### Erase
 
@@ -158,10 +157,19 @@ Coal provides a series of convenient utilities for generating ANSI escape codes:
 #### Style Text
 
 ```dart
-// Dart SDK >= 3.10.0
-final text = styleText('Hello, World!', [.red]);
-// <= 3.10.0
 final text = styleText('Hello, World!', [TextStyle.red]);
+```
+
+## Development
+
+Before publishing or merging release-oriented changes, run:
+
+```bash
+dart format --output=none --set-exit-if-changed .
+dart analyze
+dart test --exclude-tags=script-runtime
+dart test --tags=script-runtime
+dart pub publish --dry-run
 ```
 
 ## License

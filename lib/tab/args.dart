@@ -47,9 +47,6 @@ extension on CompleteCommand {
   (String, String) resolveExecInfo() {
     final script = Platform.script.toFilePath();
     final exec = Platform.resolvedExecutable;
-    // if (script.endsWith('.dart') && exec.endsWith('/dart')) {
-    //   throw UnsupportedError('dart run <file> is not currently supported');
-    // }
 
     final name = script.split(Platform.pathSeparator).last;
     if (script == exec) {
