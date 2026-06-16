@@ -149,6 +149,18 @@ void main() {
       expect(dispatcher.unbind('tab', second), isTrue);
       expect(dispatcher.isBound('tab'), isFalse);
     });
+
+    test('rejects printable-only bindings', () {
+      final dispatcher = KeyDispatcher();
+
+      expect(() => dispatcher.bind('a', (_) {}), throwsA(isA<ArgumentError>()));
+      expect(
+        () => dispatcher.bind('shift+a', (_) {}),
+        throwsA(isA<ArgumentError>()),
+      );
+      expect(() => dispatcher.bind('ctrl+a', (_) {}), returnsNormally);
+      expect(() => dispatcher.bind('meta+a', (_) {}), returnsNormally);
+    });
   });
 
   group('keypass facade', () {

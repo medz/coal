@@ -21,6 +21,13 @@ final class KeyDispatcher {
 
   void bind(String binding, KeyBindingHandler handler, {bool replace = false}) {
     final normalized = normalizeKeyBinding(binding);
+    if (_isPlainTextBinding(normalized)) {
+      throw ArgumentError.value(
+        binding,
+        'binding',
+        'printable input is emitted as TextInput, not KeyEvent',
+      );
+    }
     final handlers = _bindings.putIfAbsent(
       normalized,
       () => <KeyBindingHandler>[],
@@ -59,4 +66,14 @@ final class KeyDispatcher {
   }
 
   void clear() => _bindings.clear();
+}
+
+bool _isPlainTextBinding(String binding) {
+  final parts = binding.split('+');
+  final key = parts.last;
+  final modifiers = parts.take(parts.length - 1).toSet();
+  final hasKeyModifier =
+      modifiers.contains('ctrl') || modifiers.contains('meta');
+  if (hasKeyModifier) return false;
+  return key == 'space' || key == 'plus' || key.length == 1;
 }
