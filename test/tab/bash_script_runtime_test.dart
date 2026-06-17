@@ -3,6 +3,7 @@ library;
 
 import 'dart:io';
 
+import 'package:coal/src/tab/dart_cli.dart';
 import 'package:coal/tab.dart';
 import 'package:test/test.dart';
 
@@ -156,6 +157,82 @@ printf '%s\n' "${COMPREPLY[@]}"
         reason: 'bash runtime failed: ${result.stderr}',
       );
       expect(result.stdout, contains('--name'));
+    }, skip: !runBash);
+
+    test('bash script completes dart cli commands end-to-end', () async {
+      final tmp = await Directory.systemTemp.createTemp(
+        'coal-tab-bash-dart-cli-',
+      );
+      addTearDown(() => tmp.delete(recursive: true));
+
+      await writeScript('${tmp.path}/coal', r'''#!/usr/bin/env bash
+exec "$DART" "$COAL_BIN" "$@"
+''', executable: true);
+      final script = await writeScript(
+        '${tmp.path}/dart.bash',
+        dartCliCompletionScript(Shell.bash),
+      );
+
+      final harness = r'''
+set -euo pipefail
+
+_get_comp_words_by_ref() {
+  local OPTIND opt
+  while getopts "n:" opt; do :; done
+  shift $((OPTIND - 1))
+
+  local curvar="$1" prevvar="$2" wordsvar="$3" cwordvar="$4"
+  printf -v "$curvar" '%s' "${COMP_WORDS[COMP_CWORD]}"
+  if (( COMP_CWORD > 0 )); then
+    printf -v "$prevvar" '%s' "${COMP_WORDS[COMP_CWORD-1]}"
+  else
+    printf -v "$prevvar" ''
+  fi
+  eval "$wordsvar=(\"\${COMP_WORDS[@]}\")"
+  printf -v "$cwordvar" '%s' "$COMP_CWORD"
+}
+
+source "$COMPLETION_FILE"
+complete -p dart
+
+COMP_WORDS=(dart pu)
+COMP_CWORD=1
+__dart_complete
+printf '%s\n' "${COMPREPLY[@]}"
+
+COMPREPLY=()
+COMP_WORDS=(dart pub g)
+COMP_CWORD=2
+__dart_complete
+printf '%s\n' "${COMPREPLY[@]}"
+''';
+
+      final result = await Process.run(
+        'bash',
+        ['-lc', harness],
+        environment: {
+          'COAL_BIN': '${Directory.current.path}/bin/coal.dart',
+          'COMPLETION_FILE': script.path,
+          'DART': Platform.resolvedExecutable,
+          'PATH': '${tmp.path}:${Platform.environment['PATH'] ?? ''}',
+        },
+      );
+
+      expect(
+        result.exitCode,
+        0,
+        reason: 'bash runtime failed: ${result.stdout}\n${result.stderr}',
+      );
+      final output = (result.stdout as String)
+          .split('\n')
+          .map((line) => line.trim())
+          .where((line) => line.isNotEmpty)
+          .toList();
+
+      expect(output, contains('complete -o default -F __dart_complete dart'));
+      expect(output, contains('pub'));
+      expect(output, contains('global'));
+      expect(output, contains('get'));
     }, skip: !runBash);
 
     test(

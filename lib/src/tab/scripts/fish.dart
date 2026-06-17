@@ -11,7 +11,11 @@
 import '../flags.dart';
 import '_utils.dart';
 
-String fishScript(String name, String exec) {
+String fishScript(
+  String name,
+  String exec, {
+  bool enableDefaultCompletion = false,
+}) {
   validateShellCommandName(name);
   final escapedName = nameForVar(name);
   final execWords = fishWords(exec);

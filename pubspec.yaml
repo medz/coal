@@ -3,6 +3,9 @@ description: Composable utilities for Dart command-line apps.
 version: 0.0.7
 repository: https://github.com/medz/coal
 
+executables:
+  coal:
+
 environment:
   sdk: ^3.9.2
 
