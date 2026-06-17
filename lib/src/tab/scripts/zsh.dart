@@ -11,7 +11,11 @@
 import '../flags.dart';
 import '_utils.dart';
 
-String zshScript(String name, String exec) {
+String zshScript(
+  String name,
+  String exec, {
+  bool enableDefaultCompletion = false,
+}) {
   validateShellCommandName(name);
   final escapedName = nameForVar(name);
   final execWords = shellWords(exec);

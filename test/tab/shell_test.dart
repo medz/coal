@@ -85,5 +85,12 @@ void main() {
         contains(r"set -l requestComp 'C:\\Program Files\\tool.exe'"),
       );
     });
+
+    test('default bash generation does not enable shell file fallback', () {
+      final script = Shell.bash.generate('coaltest', '/tmp/coal');
+
+      expect(script, contains('complete -F __coaltest_complete coaltest'));
+      expect(script, isNot(contains('complete -o default')));
+    });
   });
 }

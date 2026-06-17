@@ -48,6 +48,52 @@ Completion scripts are synced from upstream
 [Cobra](https://github.com/spf13/cobra) behavior and covered by script
 contract tests.
 
+### Dart CLI Completion
+
+Install Coal globally and load completion for the Dart SDK command:
+
+```bash
+dart pub global activate coal
+source <(coal tab dart bash)
+dart <TAB>
+```
+
+Current-session setup:
+
+```bash
+# bash, with bash-completion loaded
+source <(coal tab dart bash)
+
+# zsh, after compinit
+source <(coal tab dart zsh)
+
+# fish
+coal tab dart fish | source
+
+# powershell
+coal tab dart powershell | Out-String | Invoke-Expression
+```
+
+Persistent setup examples:
+
+```bash
+# bash
+coal tab dart bash > ~/.dart-completion.bash
+printf '\nsource ~/.dart-completion.bash\n' >> ~/.bashrc
+
+# zsh
+coal tab dart zsh > ~/.dart-completion.zsh
+printf '\nsource ~/.dart-completion.zsh\n' >> ~/.zshrc
+
+# fish
+coal tab dart fish > ~/.config/fish/completions/dart.fish
+```
+
+```powershell
+coal tab dart powershell > $HOME\.dart-completion.ps1
+Add-Content -Path $PROFILE -Value '. $HOME\.dart-completion.ps1'
+```
+
 ## Args Parser
 
 Parse raw command-line tokens into a JSON-friendly argument tree:

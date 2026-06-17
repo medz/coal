@@ -1,3 +1,7 @@
+## Unreleased
+
+- feat(tab): add Dart SDK command completion setup.
+
 ## 0.0.7 - 2026-06-17
 
 - fix(args): preserve dotted siblings, dotted lists, and empty-input defaults

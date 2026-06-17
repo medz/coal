@@ -4,11 +4,13 @@ import 'flags.dart';
 import 'shell.dart';
 
 class Tab extends Command {
-  Tab() : super('', '');
+  Tab({this.emptyCompletionDirective = ShellCompDirective.noFileComp})
+    : super('', '');
 
   final commands = <String, Command>{};
   final completions = <Completion>[];
 
+  final ShellCompDirective emptyCompletionDirective;
   ShellCompDirective directive = ShellCompDirective.none;
 
   Command command(String value, String description) {
@@ -282,14 +284,19 @@ extension on Tab {
   }
 
   void complete(String toComplete) {
-    directive = ShellCompDirective.noFileComp;
     final seen = <String>{},
         value = toComplete.contains('=')
             ? toComplete.split('=').elementAt(1)
             : toComplete;
-    completions
+    final candidates = completions
         .where((comp) => seen.add(comp.value) && comp.value.startsWith(value))
-        .forEach((comp) => print('${comp.value}\t${comp.description ?? ''}'));
+        .toList();
+    directive = candidates.isEmpty
+        ? emptyCompletionDirective
+        : ShellCompDirective.noFileComp;
+    for (final comp in candidates) {
+      print('${comp.value}\t${comp.description ?? ''}');
+    }
     print(':$directive');
   }
 }
