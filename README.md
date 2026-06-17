@@ -12,6 +12,7 @@ plain Dart CLIs or existing command packages.
 | [`package:coal/args.dart`](#args-parser) | Lightweight command-line argument parsing. |
 | [`package:coal/keypass.dart`](#keypass) | Terminal key sequence decoding and binding dispatch. |
 | [`package:coal/prompt.dart`](#prompt) | Basic text prompt flow for terminal CLIs. |
+| [`package:coal/prompt_utils.dart`](#prompt-utils) | Reusable prompt helpers for common CLI questions. |
 | [`package:coal/readline.dart`](#readline) | Interactive line input with editing keys and history. |
 | [`package:coal/utils.dart`](#ansi-utility) | ANSI escape-code and terminal text helpers. |
 | [`package:coal/tab.dart`](#tab) | Shell completion definitions and script generation. |
@@ -52,6 +53,26 @@ Future<void> main() async {
   try {
     final name = await prompt.text('Name', defaultValue: 'anonymous');
     print('Hello, ${name ?? 'cancelled'}');
+  } finally {
+    await prompt.close();
+  }
+}
+```
+
+## Prompt Utils
+
+Use common prompt helpers on top of `Prompt`:
+
+```dart
+import 'package:coal/prompt.dart';
+import 'package:coal/prompt_utils.dart';
+
+Future<void> main() async {
+  final prompt = Prompt.stdio();
+
+  try {
+    final publish = await prompt.confirm('Publish?', defaultValue: false);
+    print(publish == true ? 'confirmed' : 'skipped');
   } finally {
     await prompt.close();
   }
