@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.1.0 - 2026-06-17
+
 - feat(prompt-utils): add a confirm helper.
 - feat(prompt): add basic text prompt flow.
 - feat(readline): add interactive line input handling.

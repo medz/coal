@@ -1,6 +1,6 @@
 name: coal
 description: Composable utilities for Dart command-line apps.
-version: 0.0.7
+version: 0.1.0
 repository: https://github.com/medz/coal
 
 executables:
