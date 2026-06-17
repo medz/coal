@@ -12,7 +12,9 @@ import '../flags.dart';
 import '_utils.dart';
 
 String zshScript(String name, String exec) {
+  validateShellCommandName(name);
   final escapedName = nameForVar(name);
+  final execWords = shellWords(exec);
   return '''#compdef $name
 compdef _$escapedName $name
 
@@ -40,8 +42,8 @@ _$escapedName() {
     local shellCompDirectiveFilterDirs=${ShellCompDirective.filterDirs}
     local shellCompDirectiveKeepOrder=${ShellCompDirective.keepOrder}
 
-    local lastParam lastChar flagPrefix requestComp out directive comp lastComp noSpace keepOrder
-    local -a completions
+    local lastParam lastChar flagPrefix out directive comp lastComp noSpace keepOrder
+    local -a completions requestComp describeFlagPrefix describeNoSpace describeKeepOrder
 
     __${escapedName}_debug "\\n========= starting completion logic =========="
     __${escapedName}_debug "CURRENT: \${CURRENT}, words[*]: \${words[*]}"
@@ -62,27 +64,24 @@ _$escapedName() {
     setopt local_options BASH_REMATCH
     if [[ "\${lastParam}" =~ '-.*=' ]]; then
         # We are dealing with a flag with an =
-        flagPrefix="-P \${BASH_REMATCH}"
+        flagPrefix="-P \${(q)BASH_REMATCH}"
+        describeFlagPrefix=(-P "\${BASH_REMATCH}")
     fi
 
-    # Prepare the command to obtain completions, ensuring arguments are quoted for eval
-    local -a args_to_quote=("\${(@)words[2,-1]}")
+    # Prepare the command to obtain completions.
+    local -a completion_args=("\${(@)words[2,-1]}")
     if [ "\${lastChar}" = "" ]; then
         # If the last parameter is complete (there is a space following it)
         __${escapedName}_debug "Adding extra empty parameter"
-        args_to_quote+=("")
+        completion_args+=("")
     fi
 
-    # Use Zsh's (q) flag to quote each argument safely for eval
-    local quoted_args=("\${(@q)args_to_quote}")
+    requestComp=($execWords complete --)
+    requestComp+=("\${completion_args[@]}")
 
-    # Join the main command and the quoted arguments into a single string for eval
-    requestComp="$exec complete -- \${quoted_args[*]}"
+    __${escapedName}_debug "About to call: \${requestComp[*]}"
 
-    __${escapedName}_debug "About to call: eval \${requestComp}"
-
-    # Use eval to handle any environment variables and such
-    out=\$(eval \${requestComp} 2>/dev/null)
+    out=\$("\${requestComp[@]}" 2>/dev/null)
     __${escapedName}_debug "completion output: \${out}"
 
     # Extract the directive integer following a : from the last line
@@ -160,11 +159,13 @@ _$escapedName() {
     if [ \$((directive & shellCompDirectiveNoSpace)) -ne 0 ]; then
         __${escapedName}_debug "Activating nospace."
         noSpace="-S ''"
+        describeNoSpace=(-S '')
     fi
 
     if [ \$((directive & shellCompDirectiveKeepOrder)) -ne 0 ]; then
         __${escapedName}_debug "Activating keep order."
         keepOrder="-V"
+        describeKeepOrder=(-V)
     fi
 
     if [ \$((directive & shellCompDirectiveFilterFileExt)) -ne 0 ]; then
@@ -202,7 +203,7 @@ _$escapedName() {
         return \$result
     else
         __${escapedName}_debug "Calling _describe"
-        if eval _describe \$keepOrder "completions" completions \${flagPrefix} \${noSpace}; then
+        if _describe "\${describeKeepOrder[@]}" "completions" completions "\${describeFlagPrefix[@]}" "\${describeNoSpace[@]}"; then
             __${escapedName}_debug "_describe found some completions"
 
             # Return the success of having called _describe

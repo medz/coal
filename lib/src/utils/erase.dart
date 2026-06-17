@@ -14,12 +14,12 @@ const eraseLine = '${csi}2K';
 @pragma('vm:prefer-inline')
 @pragma('wasm:prefer-inline')
 @pragma('dart2js:prefer-inline')
-const eraseLineStart = '${csi}K';
+const eraseLineStart = '${csi}1K';
 
 @pragma('vm:prefer-inline')
 @pragma('wasm:prefer-inline')
 @pragma('dart2js:prefer-inline')
-const eraseLineEnd = '${csi}1K';
+const eraseLineEnd = '${csi}K';
 
 @pragma('vm:prefer-inline')
 @pragma('wasm:prefer-inline')

@@ -2,12 +2,13 @@
 import 'dart:math' as math show max, min;
 
 final _ansiPattern = RegExp(
-  r'[\u001b\u009b]'
-  r'[[()#;?]*'
-  r'(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?'
-  r'[0-9A-ORZcf-nqry=><]'
+  r'\u001b[78]'
   r'|'
-  r'\u001b\]8;[^;]*;.*?(?:\u0007|\u001b\u005c)',
+  r'[\u001b\u009b](?:'
+  r'\][^\u0007\u001b]*(?:\u0007|\u001b\u005c|\u009c)'
+  r'|'
+  r'[\[\]()#;?]*[0-?]*(?:[ -/]*[@-~])'
+  r')',
 );
 final _controlPattern = RegExp(r'[\x00-\x08\x0A-\x1F\x7F-\x9F]{1,1000}');
 final _cjktWidePattern = RegExp(

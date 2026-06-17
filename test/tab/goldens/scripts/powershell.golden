@@ -16,6 +16,24 @@
         $_ -replace '\s|#|@|\$|;|,|''|\{|\}|\(|\)|"|\||<|>|&','\`$&'
     }
 
+    function __coaltest_commandElementValue {
+        param(
+            $CommandElement,
+            [int]$CursorPosition,
+            [string]$WordToComplete
+        )
+
+        if ($CommandElement.Extent.EndOffset -gt $CursorPosition) {
+            return $WordToComplete
+        }
+
+        if ($CommandElement -is [System.Management.Automation.Language.StringConstantExpressionAst]) {
+            return $CommandElement.Value
+        }
+
+        return $CommandElement.Extent.Text
+    }
+
 [scriptblock]$__coaltestCompleterBlock = {
     param(
             $WordToComplete,
@@ -23,23 +41,12 @@
             $CursorPosition
         )
 
-    # Get the current command line and convert into a string
-    $Command = $CommandAst.CommandElements
-    $Command = "$Command"
+    # Get the current command line.
+    $Command = $CommandAst.Extent.Text
 
     __coaltest_debug ""
     __coaltest_debug "========= starting completion logic =========="
     __coaltest_debug "WordToComplete: $WordToComplete Command: $Command CursorPosition: $CursorPosition"
-
-    # The user could have moved the cursor backwards on the command-line.
-    # We need to trigger completion from the $CursorPosition location, so we need
-    # to truncate the command-line ($Command) up to the $CursorPosition location.
-    # Make sure the $Command is longer then the $CursorPosition before we truncate.
-    # This happens because the $Command does not include the last space.
-    if ($Command.Length -gt $CursorPosition) {
-        $Command = $Command.Substring(0, $CursorPosition)
-    }
-    __coaltest_debug "Truncated command: $Command"
 
     $ShellCompDirectiveError=1
     $ShellCompDirectiveNoSpace=2
@@ -49,17 +56,28 @@
     $ShellCompDirectiveKeepOrder=32
 
     # Prepare the command to request completions for the program.
-    # Split the command at the first space to separate the program and arguments.
-    $Program, $Arguments = $Command.Split(" ", 2)
+    $RequestComp = @('/usr/bin/dart', '/path/to/testcli', "complete", "--")
 
-    $RequestComp = "& /usr/bin/dart /path/to/testcli complete -- $Arguments"
+    # Use PowerShell's parser output instead of splitting on spaces, so quoted
+    # arguments stay single argv values when passed to the completion backend.
+    $CommandElements = @(
+        $CommandAst.CommandElements | Where-Object { $_.Extent.StartOffset -lt $CursorPosition }
+    )
+    $CompletionArgs = @()
+    for ($i = 1; $i -lt $CommandElements.Length; $i++) {
+        $CompletionArgs += __coaltest_commandElementValue $CommandElements[$i] $CursorPosition $WordToComplete
+    }
+
+    if ($CompletionArgs.Length -gt 0) {
+        $RequestComp += $CompletionArgs
+    }
     __coaltest_debug "RequestComp: $RequestComp"
 
     # we cannot use $WordToComplete because it
     # has the wrong values if the cursor was moved
     # so use the last argument
-    if ($WordToComplete -ne "" ) {
-        $WordToComplete = $Arguments.Split(" ")[-1]
+    if ($CompletionArgs.Length -gt 0 -And $WordToComplete -ne "" ) {
+        $WordToComplete = $CompletionArgs[-1]
     }
     __coaltest_debug "New WordToComplete: $WordToComplete"
 
@@ -76,16 +94,7 @@
         # If the last parameter is complete (there is a space following it)
         # We add an extra empty parameter so we can indicate this to the go method.
         __coaltest_debug "Adding extra empty parameter"
-        # PowerShell 7.2+ changed the way how the arguments are passed to executables,
-        # so for pre-7.2 or when Legacy argument passing is enabled we need to use
-        if ($PSVersionTable.PsVersion -lt [version]'7.2.0' -or
-            ($PSVersionTable.PsVersion -lt [version]'7.3.0' -and -not [ExperimentalFeature]::IsEnabled("PSNativeCommandArgumentPassing")) -or
-            (($PSVersionTable.PsVersion -ge [version]'7.3.0' -or [ExperimentalFeature]::IsEnabled("PSNativeCommandArgumentPassing")) -and
-              $PSNativeCommandArgumentPassing -eq 'Legacy')) {
-             $RequestComp="$RequestComp" + ' \`"\`"'
-        } else {
-             $RequestComp = "$RequestComp" + ' ""'
-        }
+        $RequestComp += ""
     }
 
     __coaltest_debug "Calling $RequestComp"
@@ -94,18 +103,40 @@
 
     # call the command store the output in $out and redirect stderr and stdout to null
     # $Out is an array contains each line per element
-    Invoke-Expression -OutVariable out "$RequestComp" 2>&1 | Out-Null
+    $RequestArgs = @()
+    if ($RequestComp.Length -gt 1) {
+        $RequestArgs = $RequestComp[1..($RequestComp.Length - 1)]
+    }
+    $NativeArgumentPassing = Get-Variable -Name PSNativeCommandArgumentPassing -ErrorAction SilentlyContinue
+    $LegacyNativeArgs = ($PSVersionTable.PSVersion.Major -lt 6) -or (
+        $NativeArgumentPassing -and
+        $NativeArgumentPassing.Value -eq "Legacy"
+    )
+    if ($LegacyNativeArgs) {
+        $RequestArgs = @($RequestArgs | ForEach-Object {
+            if ($_ -eq "") { '""' } else { $_ }
+        })
+    }
+    $Out = @(& $RequestComp[0] @RequestArgs 2>$null)
+    if ($Out.Length -eq 0) {
+        return
+    }
 
     # get directive from last line
-    [int]$Directive = $Out[-1].TrimStart(':')
-    if ($Directive -eq "") {
-        # There is no directive specified
-        $Directive = 0
+    $DirectiveLine = [string]$Out[-1]
+    $DirectiveText = $DirectiveLine.TrimStart(':')
+    [int]$Directive = 0
+    if ($DirectiveText -ne "") {
+        $Directive = [int]$DirectiveText
     }
     __coaltest_debug "The completion directive is: $Directive"
 
     # remove directive (last element) from out
-    $Out = $Out | Where-Object { $_ -ne $Out[-1] }
+    if ($Out.Length -gt 1) {
+        $Out = $Out[0..($Out.Length - 2)]
+    } else {
+        $Out = @()
+    }
     __coaltest_debug "The completions are: $Out"
 
     if (($Directive -band $ShellCompDirectiveError) -ne 0 ) {

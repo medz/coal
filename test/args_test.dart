@@ -108,6 +108,16 @@ void main() {
       expect(args.toJson(), output);
       expect(args.rest, rest);
     });
+
+    test("collects repeated list values when the option is typed as list", () {
+      const input = ["--multi=foo", "--multi=baz"];
+      const output = {
+        "multi": ["foo", "baz"],
+      };
+      final args = Args.parse(input, list: ["multi"]);
+
+      expect(args.toJson(), output);
+    });
   });
 
   group("dotted", () {
@@ -160,6 +170,31 @@ void main() {
       final args = Args.parse(input);
       expect(args.toJson(), output);
     });
+
+    test("preserves sibling values under the same dotted parent", () {
+      const input = ["--a.b=1", "--a.c=2", "--a.d.e=3"];
+      const output = {
+        "a": {
+          "b": 1,
+          "c": 2,
+          "d": {"e": 3},
+        },
+      };
+      final args = Args.parse(input);
+      expect(args.toJson(), output);
+    });
+
+    test("appends repeated dotted list values without replacing siblings", () {
+      const input = ["--a.b=1", "--a.list=2", "--a.list=3"];
+      const output = {
+        "a": {
+          "b": 1,
+          "list": [2, 3],
+        },
+      };
+      final args = Args.parse(input, list: ["a.list"]);
+      expect(args.toJson(), output);
+    });
   });
 
   group("negated", () {
@@ -197,6 +232,50 @@ void main() {
       expect(args.toJson(), output);
     });
 
+    test("applies list type hints after alias resolution", () {
+      const input = ["-m=one", "-m=two"];
+      const output = {
+        "multi": ["one", "two"],
+      };
+      final args = Args.parse(input, aliases: {'m': 'multi'}, list: ['multi']);
+
+      expect(args.toJson(), output);
+    });
+
+    test("applies string type hints after alias resolution", () {
+      final args = Args.parse(
+        const ["-s"],
+        aliases: {'s': 'name'},
+        string: ['name'],
+      );
+
+      expect(args.toJson(), {"name": ""});
+    });
+
+    test("applies aliases to short dotted values", () {
+      final args = Args.parse(const ["-a.foo"], aliases: {'a': 'alpha'});
+
+      expect(args.toJson(), {"alpha": ".foo"});
+    });
+
+    test("applies type hints to short dotted aliases", () {
+      final args = Args.parse(
+        const ["-a.foo"],
+        aliases: {'a': 'alpha'},
+        list: ['alpha'],
+      );
+
+      expect(args.toJson(), {
+        "alpha": [".foo"],
+      });
+    });
+
+    test("keeps alias targets starting with no- as normal options", () {
+      final args = Args.parse(const ["-n"], aliases: {'n': 'no-cache'});
+
+      expect(args.toJson(), {"no-cache": true});
+    });
+
     test("ignores strings", () {
       const input = ["--no-bundle", "--watch"];
       const output = {'no-bundle': '', "watch": true};
@@ -232,6 +311,46 @@ void main() {
       expect(args.toJson(), output);
       expect(args.rest, rest);
       expect(args.args, rest);
+    });
+
+    test("empty input preserves defaults without double wrapping", () {
+      const defaults = {
+        "port": 3000,
+        "nested": {"enabled": true},
+      };
+      final args = Args.parse(const [], defaults: defaults);
+
+      expect(args.toJson(), defaults);
+    });
+
+    test("dotted values extend nested defaults", () {
+      const defaults = {
+        "server": {"host": "localhost"},
+      };
+      const output = {
+        "server": {"host": "localhost", "port": 3000},
+      };
+      final args = Args.parse(const ["--server.port=3000"], defaults: defaults);
+
+      expect(args.toJson(), output);
+    });
+
+    test("single dot value remains a string", () {
+      final args = Args.parse(const ["--path=."]);
+
+      expect(args.toJson(), {"path": "."});
+    });
+
+    test("numeric-looking invalid values remain strings", () {
+      final args = Args.parse(const ["--a=1a", "--b=.5a", "--c=1.2.3"]);
+
+      expect(args.toJson(), {"a": "1a", "b": ".5a", "c": "1.2.3"});
+    });
+
+    test("bare list option is an empty list", () {
+      final args = Args.parse(const ["--items"], list: ["items"]);
+
+      expect(args.toJson(), {"items": []});
     });
   });
 
