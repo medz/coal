@@ -1,5 +1,6 @@
 ## Unreleased
 
+- feat(readline): add interactive line input handling.
 - feat(keypass): add terminal key binding dispatch.
 - feat(tab): add Dart SDK command completion setup.
 - docs(tab): document upstream sync and test strategy.

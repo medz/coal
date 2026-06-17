@@ -11,6 +11,7 @@ plain Dart CLIs or existing command packages.
 |:----|:----|
 | [`package:coal/args.dart`](#args-parser) | Lightweight command-line argument parsing. |
 | [`package:coal/keypass.dart`](#keypass) | Terminal key sequence decoding and binding dispatch. |
+| [`package:coal/readline.dart`](#readline) | Interactive line input with editing keys and history. |
 | [`package:coal/utils.dart`](#ansi-utility) | ANSI escape-code and terminal text helpers. |
 | [`package:coal/tab.dart`](#tab) | Shell completion definitions and script generation. |
 | [`package:coal/tab/args.dart`](example/README.md#args-adapter) | Adapter for `package:args` `CommandRunner` apps. |
@@ -35,6 +36,25 @@ keys.bind('up', (event) => print('history up'));
 
 keys.handleSequence('\x03'); // ctrl+c
 keys.handleSequence('\x1b[A'); // up
+```
+
+## Readline
+
+Read one edited line from a terminal:
+
+```dart
+import 'package:coal/readline.dart';
+
+Future<void> main() async {
+  final readline = Readline.stdio();
+
+  try {
+    final name = await readline.readLine(prompt: 'Name: ');
+    print('Hello, ${name ?? 'anonymous'}');
+  } finally {
+    await readline.close();
+  }
+}
 ```
 
 ## \<TAB\>
