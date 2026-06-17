@@ -1,6 +1,7 @@
 ## Unreleased
 
 - feat(tab): add Dart SDK command completion setup.
+- docs(tab): document upstream sync and test strategy.
 
 ## 0.0.7 - 2026-06-17
 
