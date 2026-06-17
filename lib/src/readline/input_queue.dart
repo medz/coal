@@ -22,6 +22,16 @@ final class ReadlineInputQueue {
   bool _done = false;
 
   Future<ReadlineInput?> next() {
+    if (_events.isNotEmpty) {
+      return Future<ReadlineInput?>.value(_events.removeFirst());
+    }
+    if (_error case final error?) {
+      return Future<ReadlineInput?>.error(error, _stackTrace);
+    }
+    if (_done) {
+      return Future<ReadlineInput?>.value();
+    }
+
     _listen();
 
     if (_events.isNotEmpty) {
@@ -40,10 +50,11 @@ final class ReadlineInputQueue {
   }
 
   Future<void> close() async {
+    _events.clear();
+    _done = true;
     await _subscription?.cancel();
     _subscription = null;
     _parser.close();
-    _done = true;
     while (_waiters.isNotEmpty) {
       _waiters.removeFirst().complete();
     }

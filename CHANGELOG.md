@@ -1,5 +1,6 @@
 ## Unreleased
 
+- feat(prompt): add basic text prompt flow.
 - feat(readline): add interactive line input handling.
 - feat(keypass): add terminal key binding dispatch.
 - feat(tab): add Dart SDK command completion setup.
