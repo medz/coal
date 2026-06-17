@@ -46,7 +46,8 @@ See the runnable [\<TAB\> example](example/README.md#tab).
 
 Completion scripts are synced from upstream
 [Cobra](https://github.com/spf13/cobra) behavior and covered by script
-contract tests.
+contract tests. Maintainer sync and test details live in
+[TAB Maintenance](doc/tab-maintenance.md).
 
 ### Dart CLI Completion
 
